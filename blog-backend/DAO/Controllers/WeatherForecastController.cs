@@ -1,9 +1,10 @@
+using blog_backend.Dao.Repository.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace blog_backend.Controllers;
+namespace blog_backend.Dao.Controller;
 
 [ApiController]
-[Route("[controller]")]
+[Route("getWeather")]
 public class WeatherForecastController : ControllerBase
 {
     private static readonly string[] Summaries = new[]
@@ -19,9 +20,9 @@ public class WeatherForecastController : ControllerBase
     }
 
     [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    public IEnumerable<WeatherForecastDto> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+        return Enumerable.Range(1, 5).Select(index => new WeatherForecastDto
             {
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 TemperatureC = Random.Shared.Next(-20, 55),

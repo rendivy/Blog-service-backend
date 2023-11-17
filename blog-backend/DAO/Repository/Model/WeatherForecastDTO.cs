@@ -1,6 +1,6 @@
-namespace blog_backend;
+namespace blog_backend.Dao.Repository.Model;
 
-public class WeatherForecast
+public class WeatherForecastDto
 {
     public DateOnly Date { get; set; }
 
