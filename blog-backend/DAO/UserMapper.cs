@@ -6,7 +6,7 @@ namespace blog_backend.DAO;
 
 public class UserMapper
 {
-    public User MapFromAuthorizationDto(UserAuthorizationDTO authorizationDto)
+    public User MapFromAuthorizationDto(UserAuthorizationDto authorizationDto)
     {
         return new User
         {
@@ -14,18 +14,18 @@ public class UserMapper
             Email = authorizationDto.Email,
             Password = authorizationDto.Password,
             Gender = authorizationDto.Gender,
-            Name = null, 
-            Surname = null
+            Name = authorizationDto.Name,
         };
     }
 
-    public UserAuthorizationDTO MapToAuthorizationDto(User user)
+    public UserAuthorizationDto MapToAuthorizationDto(User user)
     {
-        return new UserAuthorizationDTO
+        return new UserAuthorizationDto
         {
             Gender = user.Gender,
             Email = user.Email,
-            Password = user.Password
+            Password = user.Password,
+            Name = user.Name
         };
     }
 }

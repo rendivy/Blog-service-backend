@@ -7,5 +7,5 @@ public interface IUserRepository
 {
      List<User> GetAllUsers();
      
-     void AddUser(UserAuthorizationDTO user);
+     Task AddUser(UserAuthorizationDto user);
 }

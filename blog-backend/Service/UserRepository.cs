@@ -9,8 +9,7 @@ namespace blog_backend.Service;
 public class UserRepository : IUserRepository
 {
 
-    private readonly UserMapper _userMapper = new();
-    
+    private readonly UserMapper _userMapper = new(); 
     
     public List<User> GetAllUsers()
     {
@@ -18,11 +17,11 @@ public class UserRepository : IUserRepository
         return context.User.ToList();
     }
 
-    public void AddUser(UserAuthorizationDTO user)
+    public async Task AddUser(UserAuthorizationDto user)
     {
-        using var context = new BlogDbContext(new DbContextOptions<BlogDbContext>());
+        await using var context = new BlogDbContext(new DbContextOptions<BlogDbContext>());
         context.User.Add(_userMapper.MapFromAuthorizationDto(user));
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
     
 }
