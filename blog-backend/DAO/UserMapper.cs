@@ -6,26 +6,30 @@ namespace blog_backend.DAO;
 
 public class UserMapper
 {
-    public User MapFromAuthorizationDto(UserAuthorizationDto authorizationDto)
+    public User MapFromAuthorizationDto(AuthorizationDTO authorizationDto, string hashPassword)
     {
         return new User
         {
             Id = Guid.NewGuid(),
             Email = authorizationDto.Email,
-            Password = authorizationDto.Password,
+            Password = hashPassword,
             Gender = authorizationDto.Gender,
-            Name = authorizationDto.Name,
+            FullName = authorizationDto.FullName,
+            DateOfBirth = authorizationDto.DateOfBirth,
+            PhoneNumber = authorizationDto.PhoneNumber
         };
     }
 
-    public UserAuthorizationDto MapToAuthorizationDto(User user)
+    public AuthorizationDTO MapToAuthorizationDto(User user)
     {
-        return new UserAuthorizationDto
+        return new AuthorizationDTO
         {
             Gender = user.Gender,
             Email = user.Email,
             Password = user.Password,
-            Name = user.Name
+            FullName = user.FullName,
+            DateOfBirth = user.DateOfBirth,
+            PhoneNumber = user.PhoneNumber
         };
     }
 }
