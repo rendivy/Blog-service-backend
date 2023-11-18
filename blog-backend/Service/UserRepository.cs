@@ -2,26 +2,29 @@ using blog_backend.DAO;
 using blog_backend.DAO.Repository;
 using blog_backend.Dao.Repository.Model;
 using blog_backend.Entity;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace blog_backend.Service;
 
 public class UserRepository : IUserRepository
 {
+    private readonly UserMapper _userMapper = new();
+    private readonly BlogDbContext _dbContext;
 
-    private readonly UserMapper _userMapper = new(); 
-    
-    public List<User> GetAllUsers()
+    public UserRepository(BlogDbContext dbContext)
     {
-        using var context = new BlogDbContext(new DbContextOptions<BlogDbContext>());
-        return context.User.ToList();
-    }
-
-    public async Task AddUser(UserAuthorizationDto user)
-    {
-        await using var context = new BlogDbContext(new DbContextOptions<BlogDbContext>());
-        context.User.Add(_userMapper.MapFromAuthorizationDto(user));
-        await context.SaveChangesAsync();
+        _dbContext = dbContext;
     }
     
+    public User Register(UserAuthorizationDto request)
+    {
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        User user = _userMapper.MapFromAuthorizationDto(request, passwordHash);
+        return user;
+    }
+
+    public User GetUserByEmail(string email)
+    {
+        return _dbContext.User.FirstOrDefault(u => u.Email == email);
+    }
 }

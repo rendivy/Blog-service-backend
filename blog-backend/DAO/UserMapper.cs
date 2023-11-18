@@ -6,13 +6,13 @@ namespace blog_backend.DAO;
 
 public class UserMapper
 {
-    public User MapFromAuthorizationDto(UserAuthorizationDto authorizationDto)
+    public User MapFromAuthorizationDto(UserAuthorizationDto authorizationDto, string hashPassword)
     {
         return new User
         {
             Id = Guid.NewGuid(),
             Email = authorizationDto.Email,
-            Password = authorizationDto.Password,
+            PasswordHash = hashPassword,
             Gender = authorizationDto.Gender,
             Name = authorizationDto.Name,
         };
@@ -24,7 +24,7 @@ public class UserMapper
         {
             Gender = user.Gender,
             Email = user.Email,
-            Password = user.Password,
+            Password = user.PasswordHash,
             Name = user.Name
         };
     }
