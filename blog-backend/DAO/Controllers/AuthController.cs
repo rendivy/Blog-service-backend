@@ -1,3 +1,4 @@
+using blog_backend.Common;
 using blog_backend.DAO.Repository;
 using blog_backend.Dao.Repository.Model;
 using blog_backend.Entity;
@@ -8,7 +9,7 @@ namespace blog_backend.DAO.Controllers;
 
 
 [ApiController]
-[Route("api/[controller]")]
+[Route(EndpointRouteConstants.API)]
 public class AuthController : Controller
 {
     private readonly IAuthRepository _authRepository;
@@ -23,7 +24,7 @@ public class AuthController : Controller
     }
     
     
-    [HttpPost("register")]
+    [HttpPost(EndpointRouteConstants.REGISTER)]
     public ActionResult<User> Register(AuthorizationDTO request)
     {
         if (_authRepository.GetUserByEmail(request.Email) != null)
@@ -38,20 +39,19 @@ public class AuthController : Controller
     }
 
 
-    [HttpPost("login")]
-    public ActionResult<User> Login(LoginDTO request)
+    [HttpPost(EndpointRouteConstants.LOGIN)]
+    [ProducesResponseType(typeof(TokenDTO), 200)]
+    [ProducesResponseType( typeof(ErrorDTO), 400)]
+    public ActionResult<TokenDTO> Login(LoginDTO request)
     {
        
         var user = _authRepository.GetUserByEmail(request.Email);
-        if (user == null)
-        {
-            return BadRequest("User not found");
-        }
-        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
-        {
-            return BadRequest("Invalid password");
+        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        { 
+            var error = new ErrorDTO { ErrorMessage = "Invalid email or password" };
+            return BadRequest(error);
         }
         var token = _tokenJwt.GenerateToken(user);
-        return Ok(new { Token = token });
+        return Ok(new TokenDTO { Token = token });
     }
 }
