@@ -1,11 +1,13 @@
 using blog_backend.Dao.Repository.Model;
 using blog_backend.Entity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace blog_backend.DAO.Repository;
 
 public interface IUserRepository
 {
-     List<User> GetAllUsers();
+     public User Register(UserAuthorizationDto request);
      
-     Task AddUser(UserAuthorizationDto user);
+     public User? GetUserByEmail(string email);
+     
 }
