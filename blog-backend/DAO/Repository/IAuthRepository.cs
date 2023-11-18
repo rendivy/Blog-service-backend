@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace blog_backend.DAO.Repository;
 
-public interface IUserRepository
+public interface IAuthRepository
 {
-     public User Register(UserAuthorizationDto request);
+     public User Register(AuthorizationDTO request);
      
      public User? GetUserByEmail(string email);
      
