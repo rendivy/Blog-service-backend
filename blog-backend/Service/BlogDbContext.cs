@@ -1,8 +1,7 @@
-using blog_backend.Dao.Repository.Model;
 using blog_backend.Entity;
 using Microsoft.EntityFrameworkCore;
 
-namespace blog_backend.Service;
+namespace blog_backend.DAO.Database;
 
 public class BlogDbContext : DbContext
 {

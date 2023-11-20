@@ -1,8 +1,10 @@
 using blog_backend.Common;
+using blog_backend.DAO.Database;
+using blog_backend.DAO.Model;
 using blog_backend.DAO.Repository;
-using blog_backend.Dao.Repository.Model;
 using blog_backend.Entity;
 using blog_backend.Service;
+using blog_backend.Service.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace blog_backend.DAO.Controllers;
@@ -13,14 +15,14 @@ namespace blog_backend.DAO.Controllers;
 public class AuthController : Controller
 {
     private readonly IAuthRepository _authRepository;
-    private readonly GenerateJwt _tokenJwt;
+    private readonly GenerateTokenService _tokenService;
     private readonly BlogDbContext _dbContext;
 
-    public AuthController(IAuthRepository authRepository, BlogDbContext dbContext, GenerateJwt tokenJwt)
+    public AuthController(IAuthRepository authRepository, BlogDbContext dbContext, GenerateTokenService tokenService)
     {
         _authRepository = authRepository;
         _dbContext = dbContext;
-        _tokenJwt = tokenJwt;
+        _tokenService = tokenService;
     }
     
     
@@ -34,14 +36,12 @@ public class AuthController : Controller
         var user = _authRepository.Register(request);
         _dbContext.User.Add(user);
         _dbContext.SaveChanges();
-        var token = _tokenJwt.GenerateToken(user);
+        var token = _tokenService.GenerateToken(user);
         return Ok(new { Token = token });
     }
 
 
     [HttpPost(EndpointRouteConstants.LOGIN)]
-    [ProducesResponseType(typeof(TokenDTO), 200)]
-    [ProducesResponseType( typeof(ErrorDTO), 400)]
     public ActionResult<TokenDTO> Login(LoginDTO request)
     {
        
@@ -51,7 +51,7 @@ public class AuthController : Controller
             var error = new ErrorDTO { ErrorMessage = "Invalid email or password" };
             return BadRequest(error);
         }
-        var token = _tokenJwt.GenerateToken(user);
+        var token = _tokenService.GenerateToken(user);
         return Ok(new TokenDTO { Token = token });
     }
 }

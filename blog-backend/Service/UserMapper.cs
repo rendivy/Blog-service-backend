@@ -1,8 +1,7 @@
-using blog_backend.Dao.Repository.Model;
+using blog_backend.DAO.Model;
 using blog_backend.Entity;
 
-
-namespace blog_backend.DAO;
+namespace blog_backend.Service;
 
 public class UserMapper
 {

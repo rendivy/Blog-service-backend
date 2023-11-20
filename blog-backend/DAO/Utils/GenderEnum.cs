@@ -1,4 +1,4 @@
-namespace blog_backend.DAO.Repository.Utils;
+namespace blog_backend.DAO.Utils;
 
 public enum GenderEnum
 {

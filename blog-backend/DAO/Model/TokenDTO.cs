@@ -1,4 +1,4 @@
-namespace blog_backend.Dao.Repository.Model;
+namespace blog_backend.DAO.Model;
 
 public class TokenDTO
 {
