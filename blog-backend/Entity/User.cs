@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using blog_backend.DAO.Repository.Utils;
+using blog_backend.DAO.Utils;
 
 namespace blog_backend.Entity;
 

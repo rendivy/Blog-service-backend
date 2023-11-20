@@ -1,6 +1,7 @@
-using blog_backend.DAO.Repository.Utils;
+using System.ComponentModel.DataAnnotations;
+using blog_backend.DAO.Utils;
 
-namespace blog_backend.Dao.Repository.Model;
+namespace blog_backend.DAO.Model;
 
 public class AuthorizationDTO
 {

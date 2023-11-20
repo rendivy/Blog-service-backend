@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace blog_backend.Service;
 
-public class GenerateJwt
+public class GenerateTokenService
 {
     public string GenerateToken(User user)
     {
