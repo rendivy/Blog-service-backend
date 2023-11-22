@@ -5,11 +5,11 @@ using blog_backend.DAO.Repository;
 using blog_backend.Entity;
 using blog_backend.Service;
 using blog_backend.Service.Repository;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace blog_backend.DAO.Controllers;
-
 
 [ApiController]
 [Route(EndpointRouteConstants.API)]
@@ -21,9 +21,19 @@ public class AccountController : Controller
     {
         _accountService = new AccountService(accountRepository, tokenService);
     }
-    
-    
-    
+
+    [HttpPost(EndpointRouteConstants.LOGOUT)]
+    [Authorize]
+    public async Task LogoutUser()
+    {
+        var token = await HttpContext.GetTokenAsync("access_token");
+        if (token != null)
+        {
+            await _accountService.LogoutUser(token);
+        }
+    }
+
+
     [HttpPost(EndpointRouteConstants.REGISTER)]
     public ActionResult<User> Register(AuthorizationDTO request)
     {
@@ -38,16 +48,14 @@ public class AccountController : Controller
             return BadRequest(error);
         }
     }
-    
-    
+
+
     [HttpPut(EndpointRouteConstants.PROFILE)]
     [Authorize]
     public async Task EditUser(EditAccountDTO user)
     {
         await _accountService.EditUser(user);
     }
-    
-    
 
 
     [HttpPost(EndpointRouteConstants.LOGIN)]

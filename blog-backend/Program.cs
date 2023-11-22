@@ -2,6 +2,7 @@ using System.Text;
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Repository;
 using blog_backend.Service;
+using blog_backend.Service.Middleware;
 using blog_backend.Service.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(
     options =>
-    { 
+    {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,14 +36,13 @@ builder.Services.AddAuthentication(
             RequireExpirationTime = true,
             ValidateLifetime = true
         };
-
     }
-        );
+);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<AccountService>();
-builder.Services.AddScoped<GenerateTokenService>(); 
+builder.Services.AddScoped<GenerateTokenService>();
 var app = builder.Build();
 
 
@@ -54,6 +54,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+app.UseMiddleware<ExpiredTokenMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

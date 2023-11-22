@@ -10,17 +10,22 @@ public class AccountService
 {
     private readonly IAccountRepository _accountRepository;
     private readonly GenerateTokenService _tokenService;
-    
+
 
     public AccountService(IAccountRepository accountRepository, GenerateTokenService tokenService)
     {
         _accountRepository = accountRepository;
         _tokenService = tokenService;
     }
-    
+
     public async Task EditUser(EditAccountDTO user)
     {
         await Task.Run(() => _accountRepository.EditUser(user));
+    }
+    
+    public async Task LogoutUser(String token)
+    {
+        await Task.Run(() => _accountRepository.LogoutUser(token));
     }
 
 

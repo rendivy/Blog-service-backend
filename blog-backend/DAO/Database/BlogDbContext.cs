@@ -6,10 +6,13 @@ namespace blog_backend.DAO.Database;
 
 public class BlogDbContext : IdentityDbContext
 {
-    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
-    
+    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options)
+    {
+    }
+
     public DbSet<User> User { get; set; } = null!;
-    
+    public DbSet<ExpiredToken> ExpiredTokens { get; set; } = null!;
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (optionsBuilder.IsConfigured) return;
@@ -20,6 +23,4 @@ public class BlogDbContext : IdentityDbContext
         var connectionString = configuration.GetConnectionString("WebApiDatabase");
         optionsBuilder.UseNpgsql(connectionString);
     }
-
-    
 }
