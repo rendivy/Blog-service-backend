@@ -1,3 +1,4 @@
+using System.Text;
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Repository;
 using blog_backend.Service;
@@ -8,15 +9,39 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+var secretKey = GenerateTokenService.SecretKey;
 
 builder.Services.AddDbContext<BlogDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
 builder.Services.AddControllers();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(
+    options =>
+    { 
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    }).AddJwtBearer(
+    it =>
+    {
+        var key = Encoding.ASCII.GetBytes(secretKey);
+        it.SaveToken = true;
+        it.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            RequireExpirationTime = true,
+            ValidateLifetime = true
+        };
+
+    }
+        );
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<AccountService>();
 builder.Services.AddScoped<GenerateTokenService>(); 
 var app = builder.Build();
 
@@ -28,7 +53,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

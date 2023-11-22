@@ -1,9 +1,10 @@
 using blog_backend.Entity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace blog_backend.DAO.Database;
 
-public class BlogDbContext : DbContext
+public class BlogDbContext : IdentityDbContext
 {
     public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
     

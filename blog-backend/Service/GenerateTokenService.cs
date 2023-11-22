@@ -9,10 +9,13 @@ namespace blog_backend.Service;
 
 public class GenerateTokenService
 {
+
+    public static string SecretKey = GenerateSecretKey();
+
     public string GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(GenerateSecretKey());
+        var key = Encoding.ASCII.GetBytes(SecretKey);
     
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -29,7 +32,7 @@ public class GenerateTokenService
     }
 
 
-    private static string GenerateSecretKey()
+    public static string GenerateSecretKey()
     {
         const int keyLength = 32;
         using var rng = new RNGCryptoServiceProvider();

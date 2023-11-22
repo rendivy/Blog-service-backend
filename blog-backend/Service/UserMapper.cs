@@ -18,6 +18,7 @@ public class UserMapper
             PhoneNumber = authorizationDto.PhoneNumber
         };
     }
+    
 
     public AuthorizationDTO MapToAuthorizationDto(User user)
     {
