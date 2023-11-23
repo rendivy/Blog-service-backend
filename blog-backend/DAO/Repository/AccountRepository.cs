@@ -28,7 +28,8 @@ public class AccountRepository : IAccountRepository
         var user = _userMapper.MapFromAuthorizationDto(request, passwordHash);
         return user;
     }
-
+    
+    //TODO оборачивать внутренние функции в Task 
     public void EditUser(EditAccountDTO body)
     {
         var user = GetUserByEmail(body.Email);
@@ -42,7 +43,7 @@ public class AccountRepository : IAccountRepository
         _dbContext.SaveChanges();
     }
 
-    public void LogoutUser(String token)
+    public void LogoutUser(string token)
     {
         _tokenService.SaveExpiredToken(token);
     }

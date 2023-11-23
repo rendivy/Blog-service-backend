@@ -10,7 +10,7 @@ public interface IAccountRepository
 
     public void EditUser(EditAccountDTO user);
     
-    public void LogoutUser(String token);
+    public void LogoutUser(string token);
     
     
     public User? GetUserById(Guid id);

@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var secretKey = GenerateTokenService.SecretKey;
+
 
 builder.Services.AddDbContext<BlogDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
@@ -25,7 +25,7 @@ builder.Services.AddAuthentication(
     }).AddJwtBearer(
     it =>
     {
-        var key = Encoding.ASCII.GetBytes(secretKey);
+        var key = Encoding.ASCII.GetBytes(builder.Configuration["JWT:Secret"]);
         it.SaveToken = true;
         it.TokenValidationParameters = new TokenValidationParameters
         {
@@ -38,6 +38,8 @@ builder.Services.AddAuthentication(
         };
     }
 );
+
+//TODO вынести в отдельный конфигуратор
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();

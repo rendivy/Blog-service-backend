@@ -4,11 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace blog_backend.DAO.Database;
 
+
 public class BlogDbContext : IdentityDbContext
 {
-    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options)
-    {
-    }
+    public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
 
     public DbSet<User> User { get; set; } = null!;
     public DbSet<ExpiredToken> ExpiredTokens { get; set; } = null!;
