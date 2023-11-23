@@ -1,7 +1,6 @@
-using blog_backend.Common;
-using blog_backend.DAO.Database;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using blog_backend.DAO.Model;
-using blog_backend.DAO.Repository;
 using blog_backend.Entity;
 using blog_backend.Service;
 using blog_backend.Service.Repository;
@@ -12,29 +11,28 @@ using Microsoft.AspNetCore.Mvc;
 namespace blog_backend.DAO.Controllers;
 
 [ApiController]
-[Route(EndpointRouteConstants.API)]
+[Route("api")]
 public class AccountController : Controller
 {
     private readonly AccountService _accountService;
-
-    public AccountController(IAccountRepository accountRepository, GenerateTokenService tokenService)
+    private readonly IConfiguration _configuration;
+    
+    public AccountController(IAccountRepository accountRepository, GenerateTokenService tokenService, IConfiguration configuration)
     {
+        _configuration = configuration;
         _accountService = new AccountService(accountRepository, tokenService);
     }
 
-    [HttpPost(EndpointRouteConstants.LOGOUT)]
+    [HttpPost("logout")]
     [Authorize]
     public async Task LogoutUser()
-    {
-        var token = await HttpContext.GetTokenAsync("access_token");
-        if (token != null)
-        {
-            await _accountService.LogoutUser(token);
-        }
+    { 
+        var tokenId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.SerialNumber)?.Value;
+        await _accountService.LogoutUser(tokenId);
     }
 
 
-    [HttpPost(EndpointRouteConstants.REGISTER)]
+    [HttpPost("register")]
     public ActionResult<User> Register(AuthorizationDTO request)
     {
         try
@@ -50,7 +48,7 @@ public class AccountController : Controller
     }
 
 
-    [HttpPut(EndpointRouteConstants.PROFILE)]
+    [HttpPut("profile")]
     [Authorize]
     public async Task EditUser(EditAccountDTO user)
     {
@@ -58,7 +56,7 @@ public class AccountController : Controller
     }
 
 
-    [HttpPost(EndpointRouteConstants.LOGIN)]
+    [HttpPost("login")]
     public ActionResult<TokenDTO> Login(LoginDTO request)
     {
         try

@@ -23,7 +23,7 @@ public class AccountService
         await Task.Run(() => _accountRepository.EditUser(user));
     }
     
-    public async Task LogoutUser(String token)
+    public async Task LogoutUser(string token)
     {
         await Task.Run(() => _accountRepository.LogoutUser(token));
     }
