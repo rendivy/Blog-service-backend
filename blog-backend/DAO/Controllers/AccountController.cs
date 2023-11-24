@@ -16,17 +16,27 @@ public class AccountController : Controller
 {
     private readonly AccountService _accountService;
     private readonly IConfiguration _configuration;
-    
-    public AccountController(IAccountRepository accountRepository, GenerateTokenService tokenService, IConfiguration configuration)
+
+    public AccountController(IAccountRepository accountRepository, GenerateTokenService tokenService,
+        IConfiguration configuration)
     {
         _configuration = configuration;
         _accountService = new AccountService(accountRepository, tokenService);
     }
 
+
+    [HttpGet("profile")]
+    [Authorize]
+    public ActionResult<User?> GetUserInfo()
+    {
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        return Ok(_accountService.GetUserInfo(userId).Result);
+    }
+
     [HttpPost("logout")]
     [Authorize]
     public async Task LogoutUser()
-    { 
+    {
         var tokenId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.SerialNumber)?.Value;
         await _accountService.LogoutUser(tokenId);
     }
@@ -52,7 +62,8 @@ public class AccountController : Controller
     [Authorize]
     public async Task EditUser(EditAccountDTO user)
     {
-        await _accountService.EditUser(user);
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        await _accountService.EditUser(user, userId);
     }
 
 

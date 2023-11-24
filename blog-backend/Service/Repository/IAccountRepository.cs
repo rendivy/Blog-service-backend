@@ -7,13 +7,13 @@ namespace blog_backend.Service.Repository;
 public interface IAccountRepository
 {
     public User Register(AuthorizationDTO request);
+    
+    
+    public void EditUser(EditAccountDTO user, string userId);
 
-    public void EditUser(EditAccountDTO user);
+    public Task<User?> GetUserById(string id);
     
     public void LogoutUser(string token);
-    
-    
-    public User? GetUserById(Guid id);
 
-    public User? GetUserByEmail(string email);
+    public Task<User?> GetUserByEmail(string userEmail);
 }

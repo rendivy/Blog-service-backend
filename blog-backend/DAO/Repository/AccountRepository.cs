@@ -28,19 +28,26 @@ public class AccountRepository : IAccountRepository
         var user = _userMapper.MapFromAuthorizationDto(request, passwordHash);
         return user;
     }
-    
-    //TODO оборачивать внутренние функции в Task 
-    public void EditUser(EditAccountDTO body)
+
+   
+
+
+    public void EditUser(EditAccountDTO body, string userId)
     {
-        var user = GetUserByEmail(body.Email);
-        if (user == null)
+        var user = GetUserById(userId);
+        if (user.Result == null)
         {
             throw new ArgumentException("User not found");
         }
 
-        MapEditAccountDtoToUser(body, user);
-        _dbContext.User.Update(user);
+        MapEditAccountDtoToUser(body, user.Result);
+        _dbContext.User.Update(user.Result);
         _dbContext.SaveChanges();
+    }
+
+    public Task<User?> GetUserById(string id)
+    {
+        return Task.FromResult(_dbContext.User.FirstOrDefault(u => u.Id.ToString() == id));
     }
 
     public void LogoutUser(string token)
@@ -61,8 +68,8 @@ public class AccountRepository : IAccountRepository
         return _dbContext.User.FirstOrDefault(u => u.Id == id);
     }
 
-    public User? GetUserByEmail(string email)
+    public async Task<User?> GetUserByEmail(string userEmail)
     {
-        return _dbContext.User.FirstOrDefault(u => u.Email == email);
+        return await Task.FromResult(_dbContext.User.FirstOrDefault(u => u.Email == userEmail));
     }
 }

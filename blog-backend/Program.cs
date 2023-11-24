@@ -39,7 +39,7 @@ builder.Services.AddAuthentication(
     }
 );
 
-//TODO вынести в отдельный конфигуратор
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();

@@ -17,10 +17,29 @@ public class AccountService
         _accountRepository = accountRepository;
         _tokenService = tokenService;
     }
-
-    public async Task EditUser(EditAccountDTO user)
+    
+    public Task<UserAccountDto> GetUserInfo(string userId)
     {
-        await Task.Run(() => _accountRepository.EditUser(user));
+        var user = _accountRepository.GetUserById(userId).Result;
+        if (user == null)
+        {
+            throw new ArgumentException("User not found");
+        }
+        var dto = new UserAccountDto(
+            user.Id,
+            user.FullName,
+            user.Gender,
+            user.CreateTime,
+            user.Email,
+            user.PhoneNumber,
+            user.DateOfBirth
+        );
+        return Task.FromResult(dto);
+    }
+
+    public async Task EditUser(EditAccountDTO user, string userId)
+    {
+        await Task.Run(() => _accountRepository.EditUser(user, userId));
     }
     
     public async Task LogoutUser(string token)
@@ -45,12 +64,12 @@ public class AccountService
     {
         var user = _accountRepository.GetUserByEmail(request.Email);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Result.Password))
         {
             throw new ArgumentException("Invalid email or password");
         }
 
-        var token = _tokenService.GenerateToken(user);
+        var token = _tokenService.GenerateToken(user.Result);
         return token;
     }
 }
