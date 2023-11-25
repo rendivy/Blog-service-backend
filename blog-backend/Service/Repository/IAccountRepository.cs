@@ -6,10 +6,10 @@ namespace blog_backend.Service.Repository;
 
 public interface IAccountRepository
 {
-    public User Register(AuthorizationDTO request);
+    public Task<TokenDTO> Register(AuthorizationDTO user, string hashPassword);
     
     
-    public void EditUser(EditAccountDTO user, string userId);
+    public Task EditUser(User user, string userId);
 
     public Task<User?> GetUserById(string id);
     

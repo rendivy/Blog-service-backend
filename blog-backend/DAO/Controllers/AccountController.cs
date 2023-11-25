@@ -43,14 +43,14 @@ public class AccountController : Controller
 
 
     [HttpPost("register")]
-    public ActionResult<User> Register(AuthorizationDTO request)
+    public ActionResult<User> Register([FromBody] AuthorizationDTO request)
     {
         try
         {
             var token = _accountService.RegisterUser(request);
-            return Ok(new TokenDTO { Token = token });
+            return Ok(token.Result);
         }
-        catch (ArgumentException e)
+        catch (Exception e)
         {
             var error = new ErrorDTO { Message = e.Message };
             return BadRequest(error);
@@ -60,10 +60,20 @@ public class AccountController : Controller
 
     [HttpPut("profile")]
     [Authorize]
-    public async Task EditUser(EditAccountDTO user)
+    public async Task<IActionResult> EditUser([FromBody] EditAccountDTO user)
     {
-        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-        await _accountService.EditUser(user, userId);
+        try
+        {
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            var userEmail = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
+            await _accountService.EditUser(user, userEmail, userId);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorDTO { Message = e.Message };
+            return BadRequest(error);
+        }
     }
 
 
