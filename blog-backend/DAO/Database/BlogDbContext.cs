@@ -5,12 +5,24 @@ using Microsoft.EntityFrameworkCore;
 namespace blog_backend.DAO.Database;
 
 
-public class BlogDbContext : IdentityDbContext
+public class BlogDbContext : DbContext
 {
     public BlogDbContext(DbContextOptions<BlogDbContext> options) : base(options) { }
 
-    public DbSet<User> User { get; set; } = null!;
+    public DbSet<User> User { get;  set; } = null!;
+    public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<ExpiredToken> ExpiredTokens { get; set; } = null!;
+    public DbSet<Post> Posts { get; set; } = null!;
+    public DbSet<PostTag> PostTags { get; set; } = null!;
+    
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Post>()
+            .HasMany(e => e.Tags)
+            .WithMany(e => e.Posts)
+            .UsingEntity<PostTag>();
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

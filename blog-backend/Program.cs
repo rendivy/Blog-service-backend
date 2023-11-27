@@ -1,4 +1,6 @@
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Repository;
 using blog_backend.Service;
@@ -39,11 +41,19 @@ builder.Services.AddAuthentication(
     }
 );
 
+JsonSerializerOptions options = new()
+{
+    ReferenceHandler = ReferenceHandler.IgnoreCycles,
+    WriteIndented = true
+};
+
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ITagsRepository, TagsRepository>();
 builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<TagsService>();
 builder.Services.AddScoped<GenerateTokenService>();
 var app = builder.Build();
 
