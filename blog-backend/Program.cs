@@ -46,13 +46,13 @@ JsonSerializerOptions options = new()
     ReferenceHandler = ReferenceHandler.IgnoreCycles,
     WriteIndented = true
 };
-
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ITagsRepository, TagsRepository>();
 builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<TagsService>();
 builder.Services.AddScoped<GenerateTokenService>();
 var app = builder.Build();

@@ -6,10 +6,9 @@ namespace blog_backend.Entity;
 
 public class Post
 {
-    //гордей отдельно вставлял сущности
     [Key] 
     public Guid Id { get; set; }
-    public DateTime CreateTime { get; set; }
+    public DateTime CreateTime { get; set; } = DateTime.Now;
     public string Title { get; set; }
     public string Description { get; set; }
     public int ReadingTime { get; set; }
@@ -17,9 +16,8 @@ public class Post
     public Guid AuthorId { get; set; }
     [Required]
     public string Author { get; set; }
-    public int Likes { get; set; }
-    public bool HasLike { get; set; }
-    public List<Tag> Tags { get; set; } = new();
-    public List<PostTag> PostTags { get; } = new();
+    public int Likes { get; set; } 
+    public List<User>? LikedUsers { get; set; } = new();
+    public List<Tag>? Tags { get; set; } = new();
 }
 
