@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "06osgJm3uC+t/xW+Gn0dwrVIMSQoUmyDkyFa0l4nwFecbfoFau4Lo7akpJR5LBYtp+OXcyRUp6T04ym3SWEmZw==",
+  "dgSpecHash": "Fctvov0mnoU07hBEiV3OSwnrEOTw6ImbF8EDsUJMdY0DnoGNCZbS+h/S9Pwv3gwZdIsjwMlHgyGiBkI4828cOw==",
   "success": true,
   "projectFilePath": "/Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/blog-backend.csproj",
   "expectedPackageFiles": [
@@ -37,6 +37,7 @@
     "/Users/yuriyyangel/.nuget/packages/microsoft.identitymodel.tokens/6.15.1/microsoft.identitymodel.tokens.6.15.1.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/microsoft.openapi/1.4.3/microsoft.openapi.1.4.3.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/mono.texttemplating/2.2.1/mono.texttemplating.2.2.1.nupkg.sha512",
+    "/Users/yuriyyangel/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/npgsql/7.0.6/npgsql.7.0.6.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/npgsql.entityframeworkcore.postgresql/7.0.11/npgsql.entityframeworkcore.postgresql.7.0.11.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/swashbuckle.aspnetcore/6.4.0/swashbuckle.aspnetcore.6.4.0.nupkg.sha512",

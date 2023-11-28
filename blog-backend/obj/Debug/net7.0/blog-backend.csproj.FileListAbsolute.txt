@@ -55,3 +55,4 @@
 /Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/Microsoft.Extensions.Identity.Core.dll
 /Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/Microsoft.Extensions.Identity.Stores.dll
 /Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/Microsoft.Extensions.Options.dll
+/Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/Newtonsoft.Json.dll

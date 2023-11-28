@@ -76,14 +76,14 @@ public class AccountService
 
     public string LoginUser(LoginDTO request)
     {
-        var user = _accountRepository.GetUserByEmail(request.Email);
+        var user = _accountRepository.GetUserByEmail(request.Email).Result;
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Result.Password))
+        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
         {
             throw new ArgumentException("Invalid email or password");
         }
 
-        var token = _tokenService.GenerateToken(user.Result);
+        var token = _tokenService.GenerateToken(user);
         return token;
     }
 }
