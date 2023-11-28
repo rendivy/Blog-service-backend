@@ -8,6 +8,7 @@ public interface IAccountRepository
 {
     public Task<TokenDTO> Register(AuthorizationDTO user, string hashPassword);
     
+    public Task GetUserName(string userName);
     
     public Task EditUser(User user, string userId);
 

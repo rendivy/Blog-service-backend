@@ -103,20 +103,16 @@ public class PostController : Controller
     [HttpPost]
     public async Task<IActionResult> CreatePost([FromBody] CreatePostDTO postDto)
     {
-        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-        var userName = _blogDbContext.User.FirstOrDefault(u => u.Id.ToString() == userId).FullName;
-        var post = new Post
+        try
         {
-            Title = postDto.Title,
-            Description = postDto.Description,
-            ReadingTime = postDto.ReadingTime,
-            Image = postDto.Image,
-            Author = userName,
-            AuthorId = new Guid(userId),
-            Tags = await _blogDbContext.Tags.Where(e => postDto.Tags.Contains(e.Id)).ToListAsync()
-        };
-        await _blogDbContext.Posts.AddAsync(post);
-        await _blogDbContext.SaveChangesAsync();
-        return Ok();
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            await _postService.CreatePost(postDto, new Guid(userId));
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() };
+            return BadRequest(error);
+        }
     }
 }

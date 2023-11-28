@@ -30,6 +30,11 @@ public class AccountRepository : IAccountRepository
         return await Task.FromResult(new TokenDTO { Token = token });
     }
 
+    public Task GetUserName(string userId)
+    {
+        return Task.FromResult(_dbContext.User.FirstOrDefault(u => u.Id.ToString() == userId)?.FullName);
+    }
+
     public Task EditUser(User user, string userId)
     {
         

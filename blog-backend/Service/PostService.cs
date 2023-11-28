@@ -1,4 +1,5 @@
 using blog_backend.DAO.Model;
+using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 
 namespace blog_backend.Service;
@@ -41,6 +42,19 @@ public class PostService
             }).ToList()
         };
         return postDto;
+    }
+    
+    
+    public async Task CreatePost(CreatePostDTO postDto, Guid userId)
+    {
+        var user = await _accountRepository.GetUserById(userId.ToString());
+        var tags = await _postRepository.GetTags(postDto);
+        var post = PostMapper.Map(postDto, tags, user.FullName, userId.ToString());
+        if (user == null)
+        {
+            throw new Exception("User not found");
+        }
+        await _postRepository.CreatePost(post);
     }
 
 
