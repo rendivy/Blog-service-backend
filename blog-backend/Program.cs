@@ -49,9 +49,11 @@ JsonSerializerOptions options = new()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ICommunityRepository, CommunityRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<ITagsRepository, TagsRepository>();
 builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<CommunityService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<TagsService>();
 builder.Services.AddScoped<GenerateTokenService>();

@@ -14,7 +14,7 @@ public class PostService
         _postRepository = postRepository;
         _accountRepository = accountRepository;
     }
-    
+
     public async Task<PostDTO?> GetPostDetails(Guid postId, Guid userId)
     {
         var post = await _postRepository.GetPostDetails(postId);
@@ -43,8 +43,8 @@ public class PostService
         };
         return postDto;
     }
-    
-    
+
+
     public async Task CreatePost(CreatePostDTO postDto, Guid userId)
     {
         var user = await _accountRepository.GetUserById(userId.ToString());
@@ -54,7 +54,28 @@ public class PostService
         {
             throw new Exception("User not found");
         }
+
         await _postRepository.CreatePost(post);
+    }
+
+
+    public async Task LikePost(Guid userId, Guid postId)
+    {
+        var post = await _postRepository.GetPostDetails(postId);
+        var user = await _accountRepository.GetUserById(userId.ToString());
+        var isUserLiked = post?.LikedUsers?.Any(u => u.Id == userId);
+        
+        if (isUserLiked == null || isUserLiked.Value)
+        {
+            throw new Exception("User already liked this post");
+        }
+
+        if (post == null || user == null)
+        {
+            throw new Exception("Post or user not found");
+        }
+
+        await _postRepository.LikePost(post, user);
     }
 
 
@@ -67,10 +88,12 @@ public class PostService
         {
             throw new Exception("User not liked this post");
         }
+
         if (post == null || user == null)
-        { 
+        {
             throw new Exception("Post or user not found");
         }
+
         await _postRepository.UnlikePost(post, user);
     }
 }

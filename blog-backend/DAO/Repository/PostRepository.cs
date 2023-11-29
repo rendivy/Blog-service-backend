@@ -41,9 +41,12 @@ public class PostRepository : IPostRepository
         await _databaseContext.SaveChangesAsync();
     }
 
-    public Task LikePost(Guid postId, Guid userId)
+    public async Task LikePost(Post post, User user)
     {
-        throw new NotImplementedException();
+        post.LikedUsers?.Add(user);
+        user.LikedPosts?.Add(post);
+        post.Likes++;
+        await _databaseContext.SaveChangesAsync();
     }
 
     public async Task UnlikePost(Post post, User user)

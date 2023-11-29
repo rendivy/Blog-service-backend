@@ -16,4 +16,5 @@ public class User
     public string PhoneNumber { get; set; } = null!;
     public GenderEnum Gender { get; set; }
     public List<Post>? LikedPosts { get; set; } = new ();
+    public List<CommunityMembership>? CommunityMemberships { get; set; } = new();
 }

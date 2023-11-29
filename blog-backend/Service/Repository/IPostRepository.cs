@@ -13,7 +13,7 @@ public interface IPostRepository
     
     public Task CreatePost(Post post);
 
-    public Task LikePost(Guid postId, Guid userId);
+    public Task LikePost(Post post, User user);
     
     public Task UnlikePost(Post post, User user);
 

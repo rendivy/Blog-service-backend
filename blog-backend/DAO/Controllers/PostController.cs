@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
-using blog_backend.Entity;
 using blog_backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -62,40 +61,23 @@ public class PostController : Controller
             return BadRequest(error);
         }
     }
-
-    //TODO отправлять dto с hasLike 
+    
 
     [Authorize]
     [HttpPost("{postId}/like")]
     public async Task<IActionResult> LikePost([FromRoute] Guid postId)
     {
-        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-
-        var post = await _blogDbContext.Posts
-            .Include(p => p.LikedUsers)
-            .FirstOrDefaultAsync(p => p.Id == postId);
-
-        var user = await _blogDbContext.User
-            .Include(u => u.LikedPosts)
-            .FirstOrDefaultAsync(u => u.Id.ToString() == userId);
-
-        if (post == null || user == null)
+        try
         {
-            return NotFound();
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            await _postService.LikePost(new Guid(userId), postId);
+            return Ok();
         }
-
-        if (post.LikedUsers != null && post.LikedUsers.Contains(user))
+        catch (Exception e)
         {
-            var error = new ErrorDTO
-                { Message = "You already have liked this post.", Status = BadRequest().StatusCode.ToString() };
+            var error = new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() };
             return BadRequest(error);
         }
-
-        post.LikedUsers.Add(user);
-        user.LikedPosts.Add(post);
-        post.Likes++;
-        await _blogDbContext.SaveChangesAsync();
-        return Ok();
     }
 
 
