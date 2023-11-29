@@ -16,8 +16,7 @@ public class CommunityService
         _communityRepository = communityRepository;
         _accountRepository = accountRepository;
     }
-
-
+    
     public Task UnSubscribeUserToCommunity(string communityId, string userId)
     {
         if (communityId == null) throw new ArgumentNullException(nameof(communityId));
@@ -75,10 +74,15 @@ public class CommunityService
         var community = _communityRepository.GetCommunityById(new Guid(communityId)).Result;
         var user = _accountRepository.GetUserById(userId).Result;
 
-        if (community == null || user == null)
+        if (community == null)
         {
-            throw new ArgumentException("Community or user not found");
+            throw new ArgumentException("Community not found");
         }
+        if (user == null)
+        {
+            throw new ArgumentException("User not found");
+        }
+        
         if (!_communityRepository.IsUserSubscribedToCommunity(user.Id, community.Id).Result)
         {
             return null;

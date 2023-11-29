@@ -6,6 +6,9 @@ public interface ICommunityRepository
 {
     
     public Task<string>? GetUserRoleInCommunity(Guid userId, Guid communityId);
+
+
+    public Task<List<Community>> GetUserCommunityList(Guid userId);
     
     public Task CreateCommunityAsync(Community community);
 

@@ -22,6 +22,11 @@ public class CommunityRepository : ICommunityRepository
         return Task.FromResult(membership?.RoleEnum.ToString() ?? null);
     }
 
+    public Task<List<Community>> GetUserCommunityList(Guid userId)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task CreateCommunityAsync(Community community)
     {
         _databaseContext.Communities.Add(community);
