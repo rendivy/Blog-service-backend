@@ -12,6 +12,8 @@ public class PostDTO
     public string Image { get; set; }
     public Guid AuthorId { get; set; }
     public string Author { get; set; }
+    public Guid? CommunityId { get; set; } = null;
+    public string? CommunityName { get; set; } = null;
     public int Likes { get; set; } = 0;
     public bool HasLike { get; set; }
     

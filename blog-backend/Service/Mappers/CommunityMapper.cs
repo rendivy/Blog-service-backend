@@ -13,6 +13,25 @@ public class CommunityMapper
             user.Email, user.PhoneNumber, user.DateOfBirth);
     }
 
+    public static CommunityListDTO MapToList(Community community, string userId, string role)
+    {
+        var communityDto = new CommunityListDTO { UserId = new Guid(userId), CommunityId = community.Id, Role = role };
+        return communityDto;
+    }
+
+
+    public static CommunityShortDTO MapToShort(Community community)
+    {
+        return new CommunityShortDTO(
+            community.Id,
+            community.CreateTime,
+            community.Name,
+            community.Description,
+            community.IsClosed,
+            community.SubscribersCount
+        );
+    }
+
     public static CommunityDetailsDTO MapToDetails(Community community)
     {
         return new CommunityDetailsDTO

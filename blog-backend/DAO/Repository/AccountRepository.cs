@@ -3,8 +3,6 @@ using blog_backend.DAO.Model;
 using blog_backend.Entity;
 using blog_backend.Service;
 using blog_backend.Service.Mappers;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
 using blog_backend.Service.Repository;
 
 
@@ -51,19 +49,6 @@ public class AccountRepository : IAccountRepository
     public void LogoutUser(string token)
     {
         _tokenService.SaveExpiredToken(token);
-    }
-
-    private void MapEditAccountDtoToUser(EditAccountDTO dto, User user)
-    {
-        user.FullName = dto.FullName;
-        user.Gender = dto.Gender;
-        user.PhoneNumber = dto.PhoneNumber;
-        user.DateOfBirth = dto.BirthDate;
-    }
-
-    public User? GetUserById(Guid id)
-    {
-        return _dbContext.User.FirstOrDefault(u => u.Id == id);
     }
 
     public async Task<User?> GetUserByEmail(string userEmail)

@@ -1,62 +1,49 @@
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using blog_backend.Configurator;
 using blog_backend.DAO.Database;
-using blog_backend.DAO.Repository;
 using blog_backend.Service;
 using blog_backend.Service.Middleware;
-using blog_backend.Service.Repository;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-
 builder.Services.AddDbContext<BlogDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
 builder.Services.AddControllers();
-builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(
-    options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    }).AddJwtBearer(
-    it =>
-    {
-        var key = Encoding.ASCII.GetBytes(builder.Configuration["JWT:Secret"]);
-        it.SaveToken = true;
-        it.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            RequireExpirationTime = true,
-            ValidateLifetime = true
-        };
-    }
-);
-
-JsonSerializerOptions options = new()
-{
-    ReferenceHandler = ReferenceHandler.IgnoreCycles,
-    WriteIndented = true
-};
+JwtConfigurator.AddJwt(services: builder.Services, configuration: builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<ICommunityRepository, CommunityRepository>();
-builder.Services.AddScoped<IPostRepository, PostRepository>();
-builder.Services.AddScoped<ITagsRepository, TagsRepository>();
-builder.Services.AddScoped<AccountService>();
-builder.Services.AddScoped<CommunityService>();
-builder.Services.AddScoped<PostService>();
-builder.Services.AddScoped<TagsService>();
-builder.Services.AddScoped<GenerateTokenService>();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
+RepositoryConfigurator.AddRepositories(builder.Services);
+ServiceConfigurator.AddServices(builder.Services);
+
+
 var app = builder.Build();
 
 

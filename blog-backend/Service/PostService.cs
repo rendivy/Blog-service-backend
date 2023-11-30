@@ -8,11 +8,13 @@ public class PostService
 {
     private readonly IPostRepository _postRepository;
     private readonly IAccountRepository _accountRepository;
+    private readonly ICommunityRepository _communityRepository;
 
-    public PostService(IPostRepository postRepository, IAccountRepository accountRepository)
+    public PostService(IPostRepository postRepository, IAccountRepository accountRepository, ICommunityRepository communityRepository)
     {
         _postRepository = postRepository;
         _accountRepository = accountRepository;
+        _communityRepository = communityRepository;
     }
 
     public async Task<PostDTO?> GetPostDetails(Guid postId, Guid userId)
@@ -23,6 +25,10 @@ public class PostService
             return null;
         }
 
+        
+        var community = await _communityRepository.GetCommunityById(post.CommunityId);
+        
+
         var postDto = new PostDTO
         {
             Id = post.Id,
@@ -32,6 +38,8 @@ public class PostService
             ReadingTime = post.ReadingTime,
             Image = post.Image,
             AuthorId = post.AuthorId,
+            CommunityName = community?.Name,
+            CommunityId = community?.Id,
             Author = post.Author,
             Likes = post.LikedUsers.Count,
             HasLike = post.LikedUsers.Any(u => u.Id == userId),

@@ -1,4 +1,3 @@
-using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
 using blog_backend.Service;
@@ -6,9 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace blog_backend.DAO.Controllers;
 
-[ApiController]
-[Route("api")]
-public class TagController : Controller
+
+public class TagController : GlobalController
 {
     private readonly TagsService _tagsService;
 
@@ -18,6 +16,7 @@ public class TagController : Controller
     }
     
     [HttpPost("tags")]
+    //todo дочитать про task
     public async Task<ActionResult<Tag>> CreateTag([FromBody] CreateTagDTO tagDto)
     {
         try

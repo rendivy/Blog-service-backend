@@ -9,8 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace blog_backend.DAO.Controllers;
 
 [ApiController]
-[Route("api")]
-public class AccountController : Controller
+public class AccountController : GlobalController
 {
     private readonly AccountService _accountService;
 
@@ -35,9 +34,6 @@ public class AccountController : Controller
         var tokenId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.SerialNumber)?.Value;
         await _accountService.LogoutUser(tokenId ?? string.Empty);
     }
-    
-    
-
 
     [HttpPost("register")]
     public ActionResult<User> Register([FromBody] AuthorizationDTO request)

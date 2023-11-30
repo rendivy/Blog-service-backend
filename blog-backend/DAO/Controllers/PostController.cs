@@ -1,23 +1,19 @@
 using System.Security.Claims;
-using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace blog_backend.DAO.Controllers;
 
-[ApiController]
+
 [Route("api/post")]
-public class PostController : Controller
+public class PostController : GlobalController
 {
-    private readonly BlogDbContext _blogDbContext;
     private readonly PostService _postService;
 
-    public PostController(BlogDbContext blogDbContext, PostService postService)
+    public PostController(PostService postService)
     {
-        _blogDbContext = blogDbContext;
         _postService = postService;
     }
 
@@ -61,7 +57,7 @@ public class PostController : Controller
             return BadRequest(error);
         }
     }
-    
+
 
     [Authorize]
     [HttpPost("{postId}/like")]
