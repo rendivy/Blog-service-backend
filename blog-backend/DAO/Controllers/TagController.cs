@@ -16,12 +16,12 @@ public class TagController : GlobalController
     }
     
     [HttpPost("tags")]
-    //todo дочитать про task
-    public async Task<ActionResult<Tag>> CreateTag([FromBody] CreateTagDTO tagDto)
+    public async Task<ActionResult> CreateTag([FromBody] CreateTagDTO tagDto)
     {
         try
         {
-            return Ok(await _tagsService.CreateTag(tagDto));
+            await _tagsService.CreateTag(tagDto);
+            return Ok();
         }
         catch (Exception e)
         {
@@ -32,7 +32,7 @@ public class TagController : GlobalController
 
 
     [HttpGet("tags")]
-    public ActionResult<List<Tag>> GetTags()
+    public ActionResult<List<TagDTO>> GetTags()
     {
         try
         {

@@ -18,6 +18,16 @@ public class CommunityMapper
         var communityDto = new CommunityListDTO { UserId = new Guid(userId), CommunityId = community.Id, Role = role };
         return communityDto;
     }
+    
+    
+    public static CommunityDTO MapCommunityDto(List<PostDTO> posts, PaginationDTO paginationDTO)
+    {
+        return new CommunityDTO
+        {
+            Posts = posts,
+            Pagination = paginationDTO
+        };
+    }
 
 
     public static CommunityShortDTO MapToShort(Community community)

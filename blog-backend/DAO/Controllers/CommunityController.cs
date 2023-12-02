@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Security.Claims;
 using blog_backend.DAO.Model;
+using blog_backend.DAO.Utils;
 using blog_backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,6 @@ public class CommunityController : GlobalController
     }
 
     [HttpGet("community")]
-    [Description("Get all communities")]
     public ActionResult<List<CommunityShortDTO>> GetCommunityList()
     {
         try
@@ -31,10 +31,29 @@ public class CommunityController : GlobalController
             return BadRequest(error);
         }
     }
+    
+    [HttpGet("community/{communityId}/post")]
+    public async Task<IActionResult> GetCommunityPostList(Guid communityId,
+        [FromQuery] List<string>? tags,
+        [FromQuery] SortingEnum? sorting,
+        [FromQuery] int page = 1,
+        [FromQuery] int size = 5)
+    {
+        try
+        {
+            var community = await _communityService.GetPostsWithPagination(communityId, tags, sorting, page, size);
+            return Ok(community);
+        }
+        catch (Exception e)
+        {
+            var error = new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() };
+            return BadRequest(error);
+        }
+    }
 
-    [HttpPost("community/{communityId}/subscribe")]
+
+    [HttpGet("community/{communityId}/subscribe")]
     [Authorize]
-    [Description("Subscribe user to community")]
     public async Task<IActionResult> SubscribeUserToCommunity([FromRoute] string communityId)
     {
         try
@@ -53,10 +72,9 @@ public class CommunityController : GlobalController
             return BadRequest(error);
         }
     }
-    
+
     [HttpDelete("community/{communityId}/subscribe")]
     [Authorize]
-    [Description("Unsubscribe user from community")]
     public async Task<IActionResult> UnSubscribeUserToCommunity([FromRoute] string communityId)
     {
         try
@@ -79,7 +97,6 @@ public class CommunityController : GlobalController
 
     [HttpGet("community/{communityId}/role")]
     [Authorize]
-    [Description("Get user role in community")]
     public ActionResult<string> GetUserRoleInCommunity([FromRoute] string communityId)
     {
         try
@@ -115,7 +132,6 @@ public class CommunityController : GlobalController
 
     [Authorize]
     [HttpPost("community/{communityId}/post")]
-    [Description("Create post in community")]
     public async Task<IActionResult> CreatePostInCommunity([FromRoute] string communityId,
         [FromBody] CreatePostDTO postDto)
     {
@@ -139,7 +155,6 @@ public class CommunityController : GlobalController
 
     [HttpPost("community")]
     [Authorize]
-    [Description("Create community")]
     public async Task<IActionResult> CreateCommunity([FromBody] CreateCommunityDTO communityDto)
     {
         try
@@ -162,7 +177,6 @@ public class CommunityController : GlobalController
 
     [HttpGet("community/my")]
     [Authorize]
-    [Description("Get communities where user is subscribed with greatest role")]
     public ActionResult<List<CommunityShortDTO>> GetUserCommunityList()
     {
         try

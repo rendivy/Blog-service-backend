@@ -18,11 +18,15 @@ public class TagsRepository : ITagsRepository
         return Task.FromResult(_blogDbContext.Tags.ToList());
     }
 
-    public Task<Tag> CreateTag(Tag tagDto)
+    public async Task CreateTag(Tag tagDto)
     {
         var tag = new Tag { Name = tagDto.Name };
-        _blogDbContext.Tags.Add(tag);
-        _blogDbContext.SaveChanges();
-        return Task.FromResult(tag);
+        await _blogDbContext.Tags.AddAsync(tag);
     }
+
+    public async Task SaveChanges()
+    {
+        await _blogDbContext.SaveChangesAsync();
+    }
+    
 }

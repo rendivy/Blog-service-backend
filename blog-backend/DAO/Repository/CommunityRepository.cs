@@ -50,7 +50,7 @@ public class CommunityRepository : ICommunityRepository
     }
 
     public async Task CreateCommunityAsync(Community community)
-    { 
+    {
         await _databaseContext.Communities.AddAsync(community);
     }
 
@@ -59,6 +59,7 @@ public class CommunityRepository : ICommunityRepository
         return await _databaseContext.Communities
             .Include(c => c.Memberships)!
             .ThenInclude(m => m.User)
+            .Include(c => c.Posts)
             .FirstOrDefaultAsync(c => c.Id == communityId);
     }
 

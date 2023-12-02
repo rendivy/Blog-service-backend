@@ -8,6 +8,8 @@ public interface IPostRepository
     //getPostDetails 
     
     public Task<Post?> GetPostDetails(Guid postId);
+    
+    public Task<List<Post>> GetPostsByAuthor(string authorId);
 
     public Task<List<Tag>> GetTags(CreatePostDTO postDto);
     

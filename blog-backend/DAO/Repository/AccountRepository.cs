@@ -33,6 +33,11 @@ public class AccountRepository : IAccountRepository
         return Task.FromResult(_dbContext.User.FirstOrDefault(u => u.Id.ToString() == userId)?.FullName);
     }
 
+    public async Task<List<User>> GetAuthors()
+    {
+        return await Task.FromResult(_dbContext.User.ToList());
+    }
+
     public Task EditUser(User user, string userId)
     {
         

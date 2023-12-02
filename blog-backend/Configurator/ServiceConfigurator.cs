@@ -9,6 +9,7 @@ public static class ServiceConfigurator
         services.AddScoped<AccountService>();
         services.AddScoped<CommunityService>();
         services.AddScoped<PostService>();
+        services.AddScoped<AuthorService>();
         services.AddScoped<TagsService>();
         services.AddScoped<GenerateTokenService>();
     }

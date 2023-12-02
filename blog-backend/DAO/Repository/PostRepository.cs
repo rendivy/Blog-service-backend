@@ -40,6 +40,11 @@ public class PostRepository : IPostRepository
         await _databaseContext.Posts.AddAsync(post);
         await _databaseContext.SaveChangesAsync();
     }
+    
+    public async Task<List<Post>> GetPostsByAuthor(string authorId)
+    {
+        return await _databaseContext.Posts.Where(p => p.AuthorId.ToString() == authorId).ToListAsync();
+    }
 
     public async Task LikePost(Post post, User user)
     {

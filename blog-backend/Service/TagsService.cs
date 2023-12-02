@@ -1,5 +1,6 @@
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
+using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 
 namespace blog_backend.Service;
@@ -13,14 +14,21 @@ public class TagsService
         _tagsRepository = tagsRepository;
     }
 
-    public async Task<Tag> CreateTag(CreateTagDTO tagDto)
+    public Task CreateTag(CreateTagDTO tagDto)
     {
-        var tag = new Tag { Name = tagDto.Name};
-        return await _tagsRepository.CreateTag(tag);
+        var tag = new Tag { Name = tagDto.Name };
+        var operationStatus = _tagsRepository.CreateTag(tag);
+        if (!operationStatus.IsCompletedSuccessfully)
+        {
+            throw new Exception("Failed to create tag");
+        }
+        _tagsRepository.SaveChanges();
+        return Task.CompletedTask;
     }
 
-    public async Task<List<Tag>> GetTags()
+    public async Task<List<TagDTO>> GetTags()
     {
-        return await _tagsRepository.GetTags();
+        var tags = await _tagsRepository.GetTags();
+        return tags.Select(TagMapper.MapToDTO).ToList();
     }
 }

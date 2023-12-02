@@ -10,6 +10,8 @@ public interface IAccountRepository
     
     public Task GetUserName(string userName);
     
+    public Task<List<User>> GetAuthors();
+    
     public Task EditUser(User user, string userId);
 
     public Task<User?> GetUserById(string id);

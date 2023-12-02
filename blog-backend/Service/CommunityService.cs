@@ -1,7 +1,5 @@
 using blog_backend.DAO.Model;
-using blog_backend.DAO.Repository;
 using blog_backend.DAO.Utils;
-using blog_backend.Entity;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 
@@ -20,6 +18,7 @@ public class CommunityService
         _accountRepository = accountRepository;
         _postRepository = postRepository;
     }
+
 
     public Task UnSubscribeUserToCommunity(string communityId, string userId)
     {
@@ -55,7 +54,7 @@ public class CommunityService
         if (userId == null) throw new ArgumentNullException(nameof(userId));
         var user = _accountRepository.GetUserById(userId).Result;
         if (user == null) throw new ArgumentException("User not found");
-        var userRole = _communityRepository.GetUserRoleInCommunity(user.Id, new Guid(communityId)).Result;
+        var userRole = _communityRepository.GetUserRoleInCommunity(user.Id, new Guid(communityId))?.Result;
         var communities = _communityRepository.GetUserCommunityList(user.Id).Result;
         if (userRole is not "Administrator")
         {
@@ -75,10 +74,13 @@ public class CommunityService
         if (userId == null) throw new ArgumentNullException(nameof(userId));
         var user = _accountRepository.GetUserById(userId).Result;
         if (user == null) throw new ArgumentException("User not found");
+
         var communities = _communityRepository.GetUserCommunityList(user.Id).Result;
-        return Task.FromResult(communities.Select(community =>
+        var status = Task.FromResult(communities.Select(community =>
             CommunityMapper.MapToList(community, userId,
                 _communityRepository.GetUserRoleInCommunity(user.Id, community.Id).Result!)).ToList());
+        if (!status.IsCompleted) throw new ArgumentException("Unknown error");
+        return status;
     }
 
 
@@ -99,7 +101,8 @@ public class CommunityService
             throw new ArgumentException("User is already subscribed to this community");
         }
 
-        _communityRepository.SubscribeUserToCommunity(community, user);
+        var status = _communityRepository.SubscribeUserToCommunity(community, user);
+        if (!status.IsCompleted) throw new ArgumentException("Unknown error");
         _communityRepository.SaveChangesAsync();
         return Task.CompletedTask;
     }
@@ -130,6 +133,38 @@ public class CommunityService
         return _communityRepository.GetUserRoleInCommunity(user.Id, community.Id);
     }
 
+    public async Task<CommunityDTO> GetPostsWithPagination(Guid communityId, List<string>? tags, SortingEnum? sorting,
+        int page = 1, int size = 5)
+    {
+        var community = await _communityRepository.GetCommunityById(communityId);
+        if (community == null) throw new ArgumentException("Community not found");
+
+        var postsList = community.Posts!;
+
+        if (tags != null && tags.Any())
+        {
+            postsList = postsList.Where(post => post.Tags?.Any(tag => tags.Contains(tag.Name)) ?? false).ToList();
+        }
+
+        var sortedPostsList = sorting switch
+        {
+            SortingEnum.CreateDesc => postsList.OrderByDescending(post => post.CreateTime).ToList(),
+            SortingEnum.CreateAsc => postsList.OrderBy(post => post.CreateTime).ToList(),
+            SortingEnum.LikeAsc => postsList.OrderBy(post => post.Likes).ToList(),
+            SortingEnum.LikeDesc => postsList.OrderByDescending(post => post.Likes).ToList(),
+            _ => postsList
+        };
+        var paginatedData = sortedPostsList.Skip((page - 1) * size).Take(size).ToList();
+        var pagination = new PaginationDTO
+        {
+            Page = page,
+            Size = size,
+            Current = paginatedData.Count,
+        };
+        return CommunityMapper.MapCommunityDto(paginatedData.Select(PostMapper.MapDetails).ToList(), pagination);
+    }
+
+
     public async Task<List<CommunityShortDTO>> GetCommunityList()
     {
         var communities = await _communityRepository.GetCommunityList();
@@ -141,6 +176,8 @@ public class CommunityService
         if (userId == null) throw new ArgumentNullException(nameof(userId));
         var user = _accountRepository.GetUserById(userId).Result;
         var community = CommunityMapper.Map(communityDto, user!);
-        return _communityRepository.CreateCommunityAsync(community);
+        _communityRepository.CreateCommunityAsync(community);
+        _communityRepository.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 }

@@ -6,5 +6,7 @@ public interface ITagsRepository
 { 
     public Task<List<Tag>> GetTags();
     
-    public Task<Tag> CreateTag(Tag tagDto);
+    public Task CreateTag(Tag tagDto);
+    
+    public Task SaveChanges();
 }
