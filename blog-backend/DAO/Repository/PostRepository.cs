@@ -27,6 +27,7 @@ public class PostRepository : IPostRepository
     public async Task<Post?> GetPostDetails(Guid postId)
     {
         return await _databaseContext.Posts.Include(p => p.Tags).Include(post => post.LikedUsers)
+            .Include(comment => comment.Comments)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
 
@@ -40,7 +41,7 @@ public class PostRepository : IPostRepository
         await _databaseContext.Posts.AddAsync(post);
         await _databaseContext.SaveChangesAsync();
     }
-    
+
     public async Task<List<Post>> GetPostsByAuthor(string authorId)
     {
         return await _databaseContext.Posts.Where(p => p.AuthorId.ToString() == authorId).ToListAsync();

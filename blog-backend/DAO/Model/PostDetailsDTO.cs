@@ -17,6 +17,8 @@ public class PostDTO
     public int Likes { get; set; } = 0;
     public bool HasLike { get; set; }
     
+    public List<CommentDTO>? Comments { get; set; } = new();
+    
     [Column(TypeName = "uuid[]")]
     public List<TagDTO> Tags { get; set; } = new();
 }

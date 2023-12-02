@@ -16,26 +16,72 @@ public class CommentService
     }
 
 
+    public async Task<List<CommentDTO>> GetNestedComments(string commentId)
+    {
+        var comments = _commentRepository.GetSubComments(Guid.Parse(commentId)).Result;
+        var commentList = (from comment in comments
+            let subComments = _commentRepository.GetSubComments(comment.Id).Result
+            select new CommentDTO
+            {
+                Id = comment.Id,
+                ModifiedDate = comment.ModifiedDate,
+                DeleteDate = comment.DeletedTime,
+                Content = comment.Content,
+                CreateTime = comment.CreatedTime,
+                Author = comment.Author,
+                AuthorId = comment.AuthorId,
+                SubComments = subComments.Count
+            }).ToList();
+        return await Task.FromResult(commentList);
+    }
+
+
     public async Task CreateComment(AddCommentDTO addCommentDto, string postId, string userId)
     {
-        var userFullName = _accountRepository.GetUserById(userId).Result?.FullName;
-            
-        var comment = new Comment
+        var user = _accountRepository.GetUserById(userId).Result;
+        if (addCommentDto.ParentId == null || addCommentDto.ParentId == Guid.Empty)
         {
-            Id = Guid.NewGuid(),
-            PostId = Guid.Parse(postId),
-            CreatedTime = DateTime.Now,
-            ModifiedDate = null,
-            DeletedTime = null,
-            Content = addCommentDto.Content,
-            Author = userFullName,
-            AuthorId = userId,
-            CommentParent = null
-        };
-        var status = _commentRepository.CreateComment(comment);
-        if (status.IsCompletedSuccessfully)
+            var comment = new Comment
+            {
+                Id = Guid.NewGuid(),
+                PostId = Guid.Parse(postId),
+                CreatedTime = DateTime.Now,
+                ModifiedDate = null,
+                DeletedTime = null,
+                User = user,
+                Content = addCommentDto.Content,
+                Author = user.FullName,
+                AuthorId = userId,
+                CommentParent = null
+            };
+            var status = _commentRepository.CreateComment(comment);
+            if (status.IsCompletedSuccessfully)
+            {
+                await _commentRepository.SaveChangesAsync();
+            }
+        }
+        else
         {
-            await _commentRepository.SaveChangesAsync();
+            var parentComment = _commentRepository.GetCommentById(addCommentDto.ParentId).Result;
+            if (parentComment != null) parentComment.SubComments++;
+            var comment = new Comment
+            {
+                Id = Guid.NewGuid(),
+                PostId = Guid.Parse(postId),
+                CreatedTime = DateTime.Now,
+                ModifiedDate = null,
+                DeletedTime = null,
+                User = user,
+                Content = addCommentDto.Content,
+                Author = user.FullName,
+                AuthorId = userId,
+                CommentParent = _commentRepository.GetCommentById(addCommentDto.ParentId).Result
+            };
+            var status = _commentRepository.CreateComment(comment);
+            if (status.IsCompletedSuccessfully)
+            {
+                await _commentRepository.SaveChangesAsync();
+            }
         }
     }
 

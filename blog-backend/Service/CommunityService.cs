@@ -9,14 +9,16 @@ public class CommunityService
 {
     private readonly ICommunityRepository _communityRepository;
     private readonly IAccountRepository _accountRepository;
+    private readonly ICommentRepository _commentRepository;
     private readonly IPostRepository _postRepository;
 
     public CommunityService(ICommunityRepository communityRepository, IAccountRepository accountRepository,
-        IPostRepository postRepository)
+        IPostRepository postRepository, ICommentRepository commentRepository)
     {
         _communityRepository = communityRepository;
         _accountRepository = accountRepository;
         _postRepository = postRepository;
+        _commentRepository = commentRepository;
     }
 
 

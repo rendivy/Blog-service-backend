@@ -9,6 +9,7 @@ public static class RepositoryConfigurator
     {
         services.AddScoped<IAccountRepository, AccountRepository>();
         services.AddScoped<ICommunityRepository, CommunityRepository>();
+        services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<IPostRepository, PostRepository>();
         services.AddScoped<ITagsRepository, TagsRepository>();
     }

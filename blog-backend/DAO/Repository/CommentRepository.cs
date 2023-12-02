@@ -25,7 +25,7 @@ public class CommentRepository : ICommentRepository
     }
 
 
-    public Task<Comment?> GetCommentById(Guid id)
+    public Task<Comment?> GetCommentById(Guid? id)
     {
         return Task.FromResult(_blogDbContext.Comments.FirstOrDefault(c => c.Id == id));
     }

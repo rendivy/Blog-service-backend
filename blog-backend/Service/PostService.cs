@@ -27,7 +27,8 @@ public class PostService
 
         
         var community = await _communityRepository.GetCommunityById(post.CommunityId);
-        
+        //i need only parent comments
+        var comment = post.Comments.Where(c => c.CommentParent == null).Select(CommentMapper.Map).ToList();
 
         var postDto = new PostDTO
         {
@@ -41,6 +42,7 @@ public class PostService
             CommunityName = community?.Name,
             CommunityId = community?.Id,
             Author = post.Author,
+            Comments = comment,
             Likes = post.LikedUsers.Count,
             HasLike = post.LikedUsers.Any(u => u.Id == userId),
             Tags = post.Tags.Select(t => new TagDTO
