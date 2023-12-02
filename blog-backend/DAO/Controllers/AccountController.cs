@@ -2,6 +2,7 @@ using System.Security.Claims;
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
 using blog_backend.Service;
+using blog_backend.Service.Middleware;
 using blog_backend.Service.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,6 @@ public class AccountController : GlobalController
     {
         _accountService = new AccountService(accountRepository, tokenService);
     }
-
 
     [HttpGet("profile")]
     [Authorize]
@@ -36,52 +36,29 @@ public class AccountController : GlobalController
     }
 
     [HttpPost("register")]
+    [HandleExceptions] 
     public ActionResult<User> Register([FromBody] AuthorizationDTO request)
     {
-        try
-        {
-            var token = _accountService.RegisterUser(request);
-            return Ok(token.Result);
-        }
-        catch (Exception e)
-        {
-            var error = new ErrorDTO { Message = e.Message };
-            return BadRequest(error);
-        }
+        var token = _accountService.RegisterUser(request);
+        return Ok(token.Result);
     }
-
 
     [HttpPut("profile")]
     [Authorize]
+    [HandleExceptions] 
     public async Task<IActionResult> EditUser([FromBody] EditAccountDTO user)
     {
-        try
-        {
-            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-            var userEmail = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
-            await _accountService.EditUser(user, userEmail ?? string.Empty, userId ?? string.Empty);
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            var error = new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() };
-            return BadRequest(error);
-        }
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        var userEmail = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
+        await _accountService.EditUser(user, userEmail ?? string.Empty, userId ?? string.Empty);
+        return Ok();
     }
 
-
     [HttpPost("login")]
+    [HandleExceptions] 
     public ActionResult<TokenDTO> Login([FromBody] LoginDTO request)
     {
-        try
-        {
-            var token = _accountService.LoginUser(request);
-            return Ok(new TokenDTO { Token = token });
-        }
-        catch (Exception e)
-        {
-            var error = new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() };
-            return BadRequest(error);
-        }
+        var token = _accountService.LoginUser(request);
+        return Ok(new TokenDTO { Token = token });
     }
 }

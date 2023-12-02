@@ -18,30 +18,15 @@ public class TagController : GlobalController
     [HttpPost("tags")]
     public async Task<ActionResult> CreateTag([FromBody] CreateTagDTO tagDto)
     {
-        try
-        {
-            await _tagsService.CreateTag(tagDto);
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            var statusCode = BadRequest().StatusCode.ToString();
-            return BadRequest(new ErrorDTO { Message = e.Message, Status = statusCode });
-        }
+        await _tagsService.CreateTag(tagDto); 
+        return Ok();
+        
     }
 
 
     [HttpGet("tags")]
     public ActionResult<List<TagDTO>> GetTags()
     {
-        try
-        {
-            return Ok(_tagsService.GetTags().Result);
-        }
-        catch (Exception e)
-        {
-            var statusCode = BadRequest().StatusCode.ToString();
-            return BadRequest(new ErrorDTO { Message = e.Message, Status = statusCode });
-        }
+        return Ok(_tagsService.GetTags().Result);
     }
 }

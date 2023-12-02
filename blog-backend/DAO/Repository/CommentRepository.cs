@@ -24,6 +24,18 @@ public class CommentRepository : ICommentRepository
         return _blogDbContext.SaveChangesAsync();
     }
 
+    public Task DeleteComment(Comment comment)
+    {
+        _blogDbContext.Comments.Remove(comment);
+        return Task.CompletedTask;
+    }
+
+    public Task EditComment(Comment comment)
+    {
+        _blogDbContext.Comments.Update(comment);
+        return Task.CompletedTask;
+    }
+
 
     public Task<Comment?> GetCommentById(Guid? id)
     {

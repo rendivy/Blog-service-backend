@@ -12,7 +12,7 @@ public class Comment
     public string Author { get; set; }
     public string AuthorId { get; set; }
     public User User { get; set; } = null!;
-    public string Content { get; set; } = string.Empty;
+    public string? Content { get; set; } = string.Empty;
     public int SubComments { get; set; } = 0;
     public Guid PostId { get; set; }
     public Comment? CommentParent { get; set; } = null!;

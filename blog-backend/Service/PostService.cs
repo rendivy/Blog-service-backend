@@ -24,10 +24,7 @@ public class PostService
         {
             return null;
         }
-
-        
         var community = await _communityRepository.GetCommunityById(post.CommunityId);
-        //i need only parent comments
         var comment = post.Comments.Where(c => c.CommentParent == null).Select(CommentMapper.Map).ToList();
 
         var postDto = new PostDTO
@@ -48,7 +45,8 @@ public class PostService
             Tags = post.Tags.Select(t => new TagDTO
             {
                 Id = t.Id,
-                Name = t.Name
+                Name = t.Name,
+                CreateTime = t.CreateTime
             }).ToList()
         };
         return postDto;

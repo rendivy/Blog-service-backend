@@ -15,13 +15,16 @@ public static class PostMapper
             Description = post.Description,
             ReadingTime = post.ReadingTime,
             Image = post.Image,
+            Comments = post.Comments.Select(CommentMapper.Map).ToList(),
+            CommentsCount = post.Comments.Count,
             AuthorId = post.AuthorId,
             Author = post.Author,
             Likes = post.LikedUsers.Count,
             Tags = post.Tags.Select(t => new TagDTO
             {
                 Id = t.Id,
-                Name = t.Name
+                Name = t.Name,
+                CreateTime = t.CreateTime
             }).ToList()
         };
         return postDto;

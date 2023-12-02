@@ -49,17 +49,22 @@ public class CommunityRepository : ICommunityRepository
             .ToList());
     }
 
-    public async Task CreateCommunityAsync(Community community)
+    public Task CreateCommunityAsync(Community community)
     {
-        await _databaseContext.Communities.AddAsync(community);
+        _databaseContext.Communities.AddAsync(community);
+        return Task.CompletedTask;
     }
 
     public async Task<Community?> GetCommunityById(Guid? communityId)
     {
         return await _databaseContext.Communities
-            .Include(c => c.Memberships)!
+            .Include(c => c.Memberships)
             .ThenInclude(m => m.User)
             .Include(c => c.Posts)
+            .ThenInclude(p => p.Tags)
+            .Include(c => c.Posts)
+            .ThenInclude(p => p.Comments)
+            .ThenInclude(c => c.User) // Assuming you have a navigation property named User in your Comment class
             .FirstOrDefaultAsync(c => c.Id == communityId);
     }
 

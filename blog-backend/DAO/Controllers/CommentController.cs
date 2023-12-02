@@ -10,6 +10,8 @@ namespace blog_backend.DAO.Controllers;
 public class CommentController : GlobalController
 {
     private readonly CommentService _commentService;
+    private const string CommentNotFound = "Comment not found";
+    private const string UnauthorizeUser = "You are not the author of this comment";
 
     public CommentController(CommentService commentService)
     {
@@ -21,16 +23,61 @@ public class CommentController : GlobalController
     [Route("comment/{commentId}/tree")]
     public ActionResult<List<ErrorDTO>> GetAllNestedComments([FromRoute] string commentId)
     {
+        var commentTree = _commentService.GetNestedComments(commentId).Result;
+        if (commentTree.Count == 0) return Ok("No nested comment");
+        return Ok(commentTree);
+    }
+
+    [HttpDelete]
+    [Authorize]
+    [Route("comment/{commentId}")]
+    public async Task<IActionResult> DeleteComment([FromRoute] string commentId)
+    {
         try
         {
-            var commentTree = _commentService.GetNestedComments(commentId).Result;
-            if (commentTree.Count == 0) return Ok("No nested comment");
-            return Ok(commentTree);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            await _commentService.DeleteComment(commentId, userId);
+            return Ok();
         }
         catch (Exception e)
         {
-            var error = new ErrorDTO {Message = e.Message, Status = BadRequest().StatusCode.ToString()};
-            return BadRequest(error);
+            switch (e.Message)
+            {
+                case CommentNotFound:
+                    return NotFound(new ErrorDTO { Message = e.Message, Status = NotFound().StatusCode.ToString() });
+                case UnauthorizeUser:
+                    return BadRequest(new ErrorDTO
+                        { Message = e.Message, Status = BadRequest().StatusCode.ToString() });
+            }
+
+            return BadRequest(new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() });
+        }
+    }
+
+
+    [HttpPut]
+    [Authorize]
+    [Route("comment/{commentId}")]
+    public async Task<IActionResult> EditComment([FromRoute] string commentId, [FromBody] EditCommentDTO editCommentDto)
+    {
+        try
+        {
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            await _commentService.EditComment(editCommentDto, commentId, userId);
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            switch (e.Message)
+            {
+                case CommentNotFound:
+                    return NotFound(new ErrorDTO { Message = e.Message, Status = NotFound().StatusCode.ToString() });
+                case UnauthorizeUser:
+                    return BadRequest(new ErrorDTO
+                        { Message = e.Message, Status = BadRequest().StatusCode.ToString() });
+            }
+
+            return BadRequest(new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() });
         }
     }
 
@@ -40,16 +87,8 @@ public class CommentController : GlobalController
     [Route("comment/{postId}")]
     public async Task<IActionResult> CreateComment([FromRoute] Guid postId, [FromBody] AddCommentDTO addCommentDto)
     {
-        try
-        {
-            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-            await _commentService.CreateComment(addCommentDto, postId.ToString(), userId);
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            var error = new ErrorDTO {Message = e.Message, Status = BadRequest().StatusCode.ToString()};
-            return BadRequest(error);
-        }
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        await _commentService.CreateComment(addCommentDto, postId.ToString(), userId);
+        return Ok();
     }
 }

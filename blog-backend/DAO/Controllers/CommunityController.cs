@@ -41,7 +41,8 @@ public class CommunityController : GlobalController
     {
         try
         {
-            var community = await _communityService.GetPostsWithPagination(communityId, tags, sorting, page, size);
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            var community = await _communityService.GetPostsWithPagination(communityId, tags, sorting, userId, page, size);
             return Ok(community);
         }
         catch (Exception e)
@@ -52,7 +53,7 @@ public class CommunityController : GlobalController
     }
 
 
-    [HttpGet("community/{communityId}/subscribe")]
+    [HttpPost("community/{communityId}/subscribe")]
     [Authorize]
     public async Task<IActionResult> SubscribeUserToCommunity([FromRoute] string communityId)
     {

@@ -16,16 +16,8 @@ public class AuthorController : GlobalController
     [HttpGet("author/list")]
     public ActionResult<List<AuthorDTO>> GetAuthorList()
     {
-        try
-        {
-            var authorList = _authorService.GetAuthorList().Result;
-            if (authorList.Count == 0) return NotFound();
-            return Ok(authorList);
-        }
-        catch (Exception e)
-        {
-            var error = new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() };
-            return BadRequest(error);
-        }
+        var authorList = _authorService.GetAuthorList().Result;
+        if (authorList.Count == 0) return NotFound();
+        return Ok(authorList);
     }
 }

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace blog_backend.DAO.Controllers;
 
-
 [Route("api/post")]
 public class PostController : GlobalController
 {
@@ -22,22 +21,15 @@ public class PostController : GlobalController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetPostById(Guid id)
     {
-        try
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        var post = await _postService.GetPostDetails(id, new Guid(userId));
+        if (post == null)
         {
-            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-            var post = await _postService.GetPostDetails(id, new Guid(userId));
-            if (post == null)
-            {
-                return NotFound();
-            }
+            var error = new ErrorDTO { Message = "Post not found", Status = NotFound().StatusCode.ToString() };
+            return NotFound(error);
+        }
 
-            return Ok(post);
-        }
-        catch (Exception e)
-        {
-            var error = new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() };
-            return BadRequest(error);
-        }
+        return Ok(post);
     }
 
 
@@ -57,6 +49,9 @@ public class PostController : GlobalController
             return BadRequest(error);
         }
     }
+    
+    
+    
 
 
     [Authorize]
