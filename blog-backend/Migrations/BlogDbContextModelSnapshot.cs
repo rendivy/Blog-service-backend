@@ -162,6 +162,71 @@ namespace blog_backend.Migrations
                     b.ToTable("ExpiredTokens");
                 });
 
+            modelBuilder.Entity("blog_backend.Entity.Hierarchy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AreaCode")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChangeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CityCode")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("EndDate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("NextId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ObjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("PlaceCode")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PlanCode")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PrevId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RegionCode")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StartDate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("StreetCode")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UpdatedDate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Hierarchies");
+                });
+
             modelBuilder.Entity("blog_backend.Entity.Post", b =>
                 {
                     b.Property<Guid>("Id")

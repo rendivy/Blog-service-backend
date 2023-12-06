@@ -145,7 +145,6 @@ public class CommunityService
         var community = await _communityRepository.GetCommunityById(communityId);
         if (userId == null) throw new ArgumentNullException(nameof(userId));
         if (community == null) throw new ArgumentException("Community not found");
-        
         if (community.IsClosed)
         {
             var userRole = await _communityRepository.GetUserRoleInCommunity(new Guid(userId), communityId);
@@ -158,18 +157,18 @@ public class CommunityService
         var postsList = community.Posts!;
         var sortedPostsList = sorting switch
         {
-            SortingEnum.CreateDesc => postsList.OrderByDescending(post => post.CreateTime).ToList(),
-            SortingEnum.CreateAsc => postsList.OrderBy(post => post.CreateTime).ToList(),
-            SortingEnum.LikeAsc => postsList.OrderBy(post => post.Likes).ToList(),
-            SortingEnum.LikeDesc => postsList.OrderByDescending(post => post.Likes).ToList(),
-            _ => postsList
+            SortingEnum.CreateDesc => postsList.OrderByDescending(post => post.CreateTime),
+            SortingEnum.CreateAsc => postsList.OrderBy(post => post.CreateTime),
+            SortingEnum.LikeAsc => postsList.OrderBy(post => post.Likes),
+            SortingEnum.LikeDesc => postsList.OrderByDescending(post => post.Likes),
+            _ => throw new ArgumentException ("No argument exception!")
         };
-        var paginatedData = sortedPostsList.Skip((page - 1) * size).Take(size).ToList();
+        var paginatedData = sortedPostsList.Skip((page - 1) * size).Take(size);
         var pagination = new PaginationDTO
         {
             Page = page,
             Size = size,
-            Current = paginatedData.Count,
+            Current = paginatedData.Count(),
         };
         return CommunityMapper.MapCommunityDto(paginatedData.Select(PostMapper.MapDetails).ToList(), pagination);
     }

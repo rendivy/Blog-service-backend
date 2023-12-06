@@ -13,6 +13,7 @@ public class BlogDbContext : DbContext
     public DbSet<User> User { get; set; } = null!;
     public DbSet<Tag> Tags { get; set; } = null!;
     public DbSet<Community> Communities { get; set; } = null!;
+    public DbSet<Hierarchy> Hierarchies { get; set; } = null!;
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<CommunityMembership> CommunityMemberships { get; set; } = null!;
     public DbSet<ExpiredToken> ExpiredTokens { get; set; } = null!;
