@@ -58,14 +58,14 @@ public class CommunityRepository : ICommunityRepository
     public async Task<Community?> GetCommunityById(Guid? communityId)
     {
         return await _databaseContext.Communities
-            .Include(c => c.Memberships)
-            .ThenInclude(m => m.User)
-            .Include(c => c.Posts)
-            .ThenInclude(p => p.Tags)
-            .Include(c => c.Posts)
-            .ThenInclude(p => p.Comments)
-            .ThenInclude(c => c.User) // Assuming you have a navigation property named User in your Comment class
-            .FirstOrDefaultAsync(c => c.Id == communityId);
+            .Include(community => community.Memberships)
+            .ThenInclude(membership => membership.User)
+            .Include(community => community.Posts)
+            .ThenInclude(post => post.Tags)
+            .Include(community => community.Posts)
+            .ThenInclude(post => post.Comments)
+            .ThenInclude(comment => comment.User).AsQueryable()
+            .FirstOrDefaultAsync(community => community.Id == communityId);
     }
 
     public Task<bool> IsUserSubscribedToCommunity(Guid userId, Guid communityId)

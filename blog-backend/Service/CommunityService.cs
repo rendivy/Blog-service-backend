@@ -1,5 +1,6 @@
 using blog_backend.DAO.Model;
 using blog_backend.DAO.Utils;
+using blog_backend.Entity;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 
@@ -20,8 +21,10 @@ public class CommunityService
         _postRepository = postRepository;
         _commentRepository = commentRepository;
     }
-
-
+    
+    
+    
+    //TODO: консм
     public Task UnSubscribeUserToCommunity(string communityId, string userId)
     {
         if (communityId == null) throw new ArgumentNullException(nameof(communityId));
@@ -75,18 +78,24 @@ public class CommunityService
     }
 
 
-    public Task<List<CommunityListDTO>> GetUserCommunityList(string userId)
+    public async Task<List<CommunityListDTO>> GetUserCommunityList(string userId)
     {
         if (userId == null) throw new ArgumentNullException(nameof(userId));
-        var user = _accountRepository.GetUserById(userId).Result;
+    
+        var user = await _accountRepository.GetUserById(userId);
         if (user == null) throw new ArgumentException("User not found");
-
-        var communities = _communityRepository.GetUserCommunityList(user.Id).Result;
-        var status = Task.FromResult(communities.Select(community =>
-            CommunityMapper.MapToList(community, userId,
-                _communityRepository.GetUserRoleInCommunity(user.Id, community.Id).Result!)).ToList());
-        if (!status.IsCompleted) throw new ArgumentException("Unknown error");
-        return status;
+    
+        var communities = await _communityRepository.GetUserCommunityList(user.Id);
+    
+        var userList = new List<CommunityListDTO>();
+        foreach (var community in communities)
+        {
+            var userRoleInCommunity = await _communityRepository.GetUserRoleInCommunity(user.Id, community.Id);
+            var communityDto = CommunityMapper.MapToList(community, userId, userRoleInCommunity);
+            userList.Add(communityDto);
+        }
+    
+        return userList;
     }
 
 
@@ -153,8 +162,9 @@ public class CommunityService
                 throw new ArgumentException("You are not subscribed to this community");
             }
         }
-
-        var postsList = community.Posts!;
+        
+       
+        var postsList = community.Posts!.AsQueryable();
         var sortedPostsList = sorting switch
         {
             SortingEnum.CreateDesc => postsList.OrderByDescending(post => post.CreateTime),
@@ -171,6 +181,14 @@ public class CommunityService
             Current = paginatedData.Count(),
         };
         return CommunityMapper.MapCommunityDto(paginatedData.Select(PostMapper.MapDetails).ToList(), pagination);
+    }
+
+
+    public IQueryable<Post> getPostsFromCommunity(Guid communityId)
+    {
+        var community = _communityRepository.GetCommunityById(communityId).Result;
+        if (community == null) throw new ArgumentException("Community not found");
+        return community.Posts!.AsQueryable();
     }
 
 

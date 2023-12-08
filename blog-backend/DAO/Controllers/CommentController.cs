@@ -11,7 +11,7 @@ public class CommentController : GlobalController
 {
     private readonly CommentService _commentService;
     private const string CommentNotFound = "Comment not found";
-    private const string UnauthorizeUser = "You are not the author of this comment";
+    private const string UnauthorizedUser = "You are not the author of this comment";
 
     public CommentController(CommentService commentService)
     {
@@ -45,16 +45,17 @@ public class CommentController : GlobalController
             {
                 case CommentNotFound:
                     return NotFound(new ErrorDTO { Message = e.Message, Status = NotFound().StatusCode.ToString() });
-                case UnauthorizeUser:
+                case UnauthorizedUser:
                     return BadRequest(new ErrorDTO
                         { Message = e.Message, Status = BadRequest().StatusCode.ToString() });
             }
 
             return BadRequest(new ErrorDTO { Message = e.Message, Status = BadRequest().StatusCode.ToString() });
         }
-    }
-
-
+    } 
+    
+    
+    
     [HttpPut]
     [Authorize]
     [Route("comment/{commentId}")]
@@ -72,7 +73,7 @@ public class CommentController : GlobalController
             {
                 case CommentNotFound:
                     return NotFound(new ErrorDTO { Message = e.Message, Status = NotFound().StatusCode.ToString() });
-                case UnauthorizeUser:
+                case UnauthorizedUser:
                     return BadRequest(new ErrorDTO
                         { Message = e.Message, Status = BadRequest().StatusCode.ToString() });
             }
