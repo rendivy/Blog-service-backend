@@ -1,13 +1,14 @@
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
+using blog_backend.Entity.PostEntities;
 
 namespace blog_backend.Service.Mappers;
 
 public static class PostMapper
 {
-    public static PostDTO MapDetails(Post post)
+    public static PostDetailsDTO MapDetails(Post post)
     {
-        var postDto = new PostDTO
+        var postDto = new PostDetailsDTO
         {
             Id = post.Id,
             CreateTime = post.CreateTime,

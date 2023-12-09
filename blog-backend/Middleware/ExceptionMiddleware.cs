@@ -2,7 +2,7 @@ using System.Net;
 using blog_backend.DAO.Model;
 using Newtonsoft.Json;
 
-namespace blog_backend.Service.Middleware;
+namespace blog_backend.Middleware;
 
 public class ExceptionMiddleware
 {

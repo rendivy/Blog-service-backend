@@ -1,5 +1,6 @@
 using blog_backend.DAO.Database;
 using blog_backend.Entity;
+using blog_backend.Entity.CommentEntity;
 using blog_backend.Service.Repository;
 
 namespace blog_backend.DAO.Repository;

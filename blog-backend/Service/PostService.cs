@@ -17,7 +17,7 @@ public class PostService
         _communityRepository = communityRepository;
     }
 
-    public async Task<PostDTO?> GetPostDetails(Guid postId, Guid userId)
+    public async Task<PostDetailsDTO?> GetPostDetails(Guid postId, Guid userId)
     {
         var post = await _postRepository.GetPostDetails(postId);
         if (post == null)
@@ -27,7 +27,7 @@ public class PostService
         var community = await _communityRepository.GetCommunityById(post.CommunityId);
         var comment = post.Comments.Where(c => c.CommentParent == null).Select(CommentMapper.Map).ToList();
 
-        var postDto = new PostDTO
+        var postDto = new PostDetailsDTO
         {
             Id = post.Id,
             CreateTime = post.CreateTime,

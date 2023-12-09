@@ -1,8 +1,9 @@
 using System.Security.Claims;
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
+using blog_backend.Entity.AccountEntities;
+using blog_backend.Middleware;
 using blog_backend.Service;
-using blog_backend.Service.Middleware;
 using blog_backend.Service.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

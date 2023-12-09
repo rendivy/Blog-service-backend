@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace blog_backend.DAO.Model;
 
-public class PostDTO
+public class PostDetailsDTO
 {
     public Guid Id { get; set; }
     public DateTime CreateTime { get; set; }

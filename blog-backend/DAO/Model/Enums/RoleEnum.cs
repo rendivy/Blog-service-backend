@@ -1,4 +1,4 @@
-namespace blog_backend.DAO.Utils;
+namespace blog_backend.Enums;
 
 public enum RoleEnum
 {

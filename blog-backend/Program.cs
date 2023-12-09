@@ -1,7 +1,6 @@
 using blog_backend.Configuration;
 using blog_backend.DAO.Database;
-using blog_backend.Service;
-using blog_backend.Service.Middleware;
+using blog_backend.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -13,6 +12,8 @@ builder.Services.AddDbContext<BlogDbContext>(
 builder.Services.AddControllers();
 builder.Services.AddDbContext<GarDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("GarDatabase")));
+builder.Services.AddSingleton<RedisRepository>(
+    new RedisRepository(builder.Configuration.GetConnectionString("RedisDatabase")));
 
 JwtConfiguration.AddJwt(services: builder.Services, configuration: builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();

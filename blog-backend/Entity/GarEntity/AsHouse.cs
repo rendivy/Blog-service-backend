@@ -1,4 +1,4 @@
-﻿namespace blog_backend.Entity;
+﻿namespace blog_backend.Entity.GarEntity;
 
 /// <summary>
 /// Сведения по номерам домов улиц городов и населенных пунктов

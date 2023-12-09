@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using blog_backend.DAO.Database;
 using blog_backend.Entity;
+using blog_backend.Entity.AccountEntities;
 using Microsoft.IdentityModel.Tokens;
 
 namespace blog_backend.Service;
@@ -12,11 +13,14 @@ public class GenerateTokenService
 {
     private readonly IConfiguration _configuration;
     private readonly BlogDbContext _dbContext;
+    private readonly RedisRepository _redisRepository;
+    
 
-    public GenerateTokenService(BlogDbContext dbContext, IConfiguration configuration)
+    public GenerateTokenService(BlogDbContext dbContext, IConfiguration configuration, RedisRepository redisRepository)
     {
         _dbContext = dbContext;
         _configuration = configuration;
+        _redisRepository = redisRepository;
     }
 
     public string GenerateToken(User user)
@@ -51,14 +55,7 @@ public class GenerateTokenService
 
     public void SaveExpiredToken(string tokenId)
     {
-        var guidTokenId = Guid.TryParse(tokenId, out var guid) ? guid : Guid.Empty;
-        _dbContext.ExpiredTokens.Add(new ExpiredToken
-        {
-            Id = guidTokenId,
-            ExpiryDate = DateTime.UtcNow
-        });
-
-        _dbContext.SaveChanges();
+        _redisRepository.AddExpiredToken(tokenId);
     }
 
     private DateTime? GetTokenExpiryDate(string token)

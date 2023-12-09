@@ -1,5 +1,6 @@
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
+using blog_backend.Entity.AccountEntities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace blog_backend.Service.Repository;

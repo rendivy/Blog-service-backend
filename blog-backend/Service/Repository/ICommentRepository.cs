@@ -1,4 +1,5 @@
 using blog_backend.Entity;
+using blog_backend.Entity.CommentEntity;
 
 namespace blog_backend.Service.Repository;
 

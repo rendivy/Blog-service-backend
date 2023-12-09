@@ -1,6 +1,7 @@
-using blog_backend.DAO.Utils;
+using blog_backend.Entity.AccountEntities;
+using blog_backend.Enums;
 
-namespace blog_backend.Entity;
+namespace blog_backend.Entity.CommunityEntities;
 
 public class CommunityMembership
 {

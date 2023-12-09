@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace blog_backend.Entity;
+namespace blog_backend.Entity.PostEntities;
 
 public class Tag
 {

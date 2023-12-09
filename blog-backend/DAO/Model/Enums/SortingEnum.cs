@@ -1,4 +1,4 @@
-namespace blog_backend.DAO.Utils;
+namespace blog_backend.DAO.Model.Enums;
 
 
 public enum SortingEnum

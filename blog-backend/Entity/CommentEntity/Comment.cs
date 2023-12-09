@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
+using blog_backend.Entity.AccountEntities;
+using blog_backend.Entity.PostEntities;
 
-namespace blog_backend.Entity;
+namespace blog_backend.Entity.CommentEntity;
 
 public class Comment
 {

@@ -1,7 +1,8 @@
 using System.ComponentModel;
 using System.Security.Claims;
 using blog_backend.DAO.Model;
-using blog_backend.DAO.Utils;
+using blog_backend.DAO.Model.Enums;
+using blog_backend.Enums;
 using blog_backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

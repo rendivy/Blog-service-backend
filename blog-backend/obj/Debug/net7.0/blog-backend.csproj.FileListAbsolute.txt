@@ -63,3 +63,5 @@
 /Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/xunit.core.dll
 /Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/xunit.execution.dotnet.dll
 /Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/runtimes/win/lib/net6.0/System.Diagnostics.EventLog.Messages.dll
+/Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/Pipelines.Sockets.Unofficial.dll
+/Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/bin/Debug/net7.0/StackExchange.Redis.dll

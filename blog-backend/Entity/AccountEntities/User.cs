@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-using blog_backend.DAO.Utils;
+using blog_backend.Entity.CommunityEntities;
+using blog_backend.Entity.PostEntities;
+using blog_backend.Enums;
 
-namespace blog_backend.Entity;
+namespace blog_backend.Entity.AccountEntities;
 
 public class User
 {

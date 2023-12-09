@@ -1,4 +1,5 @@
 ﻿using blog_backend.Entity;
+using blog_backend.Entity.GarEntity;
 using Microsoft.EntityFrameworkCore;
 
 namespace blog_backend.DAO.Database;

@@ -1,4 +1,4 @@
-﻿namespace blog_backend.Entity;
+﻿namespace blog_backend.Entity.GarEntity;
 
 /// <summary>
 /// Сведения классификатора адресообразующих элементов
