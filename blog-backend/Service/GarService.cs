@@ -27,7 +27,8 @@ public class GarService : IGarService
                 asAddrObj => asAddrObj.Objectid,
                 (asAdmHierarchy, asAddrObj) => new { asAdmHierarchy, asAddrObj })
             .Where(joined =>
-                joined.asAdmHierarchy.Parentobjid == parentObjectId && joined.asAddrObj.Isactive == 1 && joined.asAddrObj.Isactual == 1 && joined.asAddrObj.Normalize_name.Contains(lowerQuery))
+                joined.asAdmHierarchy.Parentobjid == parentObjectId && joined.asAddrObj.Isactive == 1 &&
+                joined.asAddrObj.Isactual == 1 && joined.asAddrObj.Normalize_name.Contains(lowerQuery))
             .Select(joined => new AddressDTO
             {
                 ObjectId = joined.asAddrObj.Objectid,
@@ -79,7 +80,7 @@ public class GarService : IGarService
         var addressObject = await _garContext.AsAddrObjs
             .FirstOrDefaultAsync(address => address.Objectguid == objectGuid);
 
-        var path = "";
+        string? path;
 
         if (houseObject == null)
         {
@@ -92,18 +93,19 @@ public class GarService : IGarService
                 .Select(obj => obj.Path).FirstOrDefaultAsync();
         }
 
-        var pathArray = path.Split('.').Select(int.Parse).ToList();
+        var pathArray = path?.Split('.').Select(int.Parse).ToList();
         var result = new List<AddressDTO>();
         var houseIndex = 0;
         for (var i = 0; i < pathArray.Count; i++)
         {
             var address = await _garContext.AsAddrObjs
                 .FirstOrDefaultAsync(obj => obj.Objectid == pathArray[i]);
-            if (address == null) {
+            if (address == null)
+            {
                 houseIndex = i;
                 break;
             }
-            
+
             var addressDto = new AddressDTO
             {
                 ObjectId = address.Objectid,
@@ -120,7 +122,7 @@ public class GarService : IGarService
             var house = await _garContext.AsHouses
                 .FirstOrDefaultAsync(obj => obj.Objectid == pathArray[i]);
             if (house == null) continue;
-            
+
             var addressDto = new AddressDTO
             {
                 ObjectId = house.Objectid,
@@ -129,7 +131,7 @@ public class GarService : IGarService
                 Level = GarExtensions.ToGarAddressLevel("10").ToString(),
                 ObjectLevelText = GarExtensions.ObjectLevelToString(GarExtensions.ToGarAddressLevel("10"))
             };
-            
+
             result.Add(addressDto);
         }
 
