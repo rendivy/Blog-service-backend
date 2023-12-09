@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using blog_backend.Service;
+using blog_backend.DAO.Database;
 
 #nullable disable
 
@@ -22,30 +22,408 @@ namespace blog_backend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("PostTag", b =>
+                {
+                    b.Property<Guid>("PostsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TagsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("PostsId", "TagsId");
+
+                    b.HasIndex("TagsId");
+
+                    b.ToTable("PostTag");
+                });
+
+            modelBuilder.Entity("PostUser", b =>
+                {
+                    b.Property<Guid>("LikedPostsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("LikedUsersId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("LikedPostsId", "LikedUsersId");
+
+                    b.HasIndex("LikedUsersId");
+
+                    b.ToTable("PostUser");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("CommentParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("DeletedTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("SubComments")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommentParentId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Community", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsClosed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("SubscribersCount")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Communities");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.CommunityMembership", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CommunityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("RoleEnum")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "CommunityId");
+
+                    b.HasIndex("CommunityId");
+
+                    b.ToTable("CommunityMemberships");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.ExpiredToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExpiredTokens");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Hierarchy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AreaCode")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChangeId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("CityCode")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("EndDate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("NextId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ObjectId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("PlaceCode")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PlanCode")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PrevId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RegionCode")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StartDate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("StreetCode")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UpdatedDate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Hierarchies");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("CommunityId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CommunityName")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Likes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ReadingTime")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommunityId");
+
+                    b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Tag", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags");
+                });
+
             modelBuilder.Entity("blog_backend.Entity.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Gender")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("User");
+                });
+
+            modelBuilder.Entity("PostTag", b =>
+                {
+                    b.HasOne("blog_backend.Entity.Post", null)
+                        .WithMany()
+                        .HasForeignKey("PostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("blog_backend.Entity.Tag", null)
+                        .WithMany()
+                        .HasForeignKey("TagsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PostUser", b =>
+                {
+                    b.HasOne("blog_backend.Entity.Post", null)
+                        .WithMany()
+                        .HasForeignKey("LikedPostsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("blog_backend.Entity.User", null)
+                        .WithMany()
+                        .HasForeignKey("LikedUsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Comment", b =>
+                {
+                    b.HasOne("blog_backend.Entity.Comment", "CommentParent")
+                        .WithMany()
+                        .HasForeignKey("CommentParentId");
+
+                    b.HasOne("blog_backend.Entity.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("blog_backend.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CommentParent");
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.CommunityMembership", b =>
+                {
+                    b.HasOne("blog_backend.Entity.Community", "Community")
+                        .WithMany("Memberships")
+                        .HasForeignKey("CommunityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("blog_backend.Entity.User", "User")
+                        .WithMany("CommunityMemberships")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Community");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Post", b =>
+                {
+                    b.HasOne("blog_backend.Entity.Community", null)
+                        .WithMany("Posts")
+                        .HasForeignKey("CommunityId");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Community", b =>
+                {
+                    b.Navigation("Memberships");
+
+                    b.Navigation("Posts");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.Post", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.User", b =>
+                {
+                    b.Navigation("CommunityMemberships");
                 });
 #pragma warning restore 612, 618
         }

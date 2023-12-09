@@ -1,24 +1,55 @@
-using blog_backend.DAO.Repository;
+using blog_backend.Configuration;
+using blog_backend.DAO.Database;
 using blog_backend.Service;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using blog_backend.Service.Middleware;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 builder.Services.AddDbContext<BlogDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddDbContext<GarDbContext>(
+    options => options.UseNpgsql(builder.Configuration.GetConnectionString("GarDatabase")));
+
+JwtConfiguration.AddJwt(services: builder.Services, configuration: builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<GenerateJwt>(); 
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
+RepositoryConfiguration.AddRepositories(builder.Services);
+ServiceConfiguration.AddServices(builder.Services);
+
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -26,7 +57,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
+app.UseMiddleware<ExpiredTokenMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
