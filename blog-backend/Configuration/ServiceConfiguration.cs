@@ -1,8 +1,9 @@
+using blog_backend.DAO.IService;
 using blog_backend.Service;
 
-namespace blog_backend.Configurator;
+namespace blog_backend.Configuration;
 
-public static class ServiceConfigurator
+public static class ServiceConfiguration
 {
     public static void AddServices(IServiceCollection services)
     {
@@ -13,5 +14,6 @@ public static class ServiceConfigurator
         services.AddScoped<AuthorService>();
         services.AddScoped<TagsService>();
         services.AddScoped<GenerateTokenService>();
+        services.AddScoped<IGarService, GarService>();
     }
 }

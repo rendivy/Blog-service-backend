@@ -2,9 +2,9 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace blog_backend.Configurator;
+namespace blog_backend.Configuration;
 
-public static class JwtConfigurator
+public static class JwtConfiguration
 {
     public static void AddJwt(IServiceCollection services, IConfiguration configuration)
     {

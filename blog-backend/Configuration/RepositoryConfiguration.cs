@@ -1,9 +1,9 @@
 using blog_backend.DAO.Repository;
 using blog_backend.Service.Repository;
 
-namespace blog_backend.Configurator;
+namespace blog_backend.Configuration;
 
-public static class RepositoryConfigurator
+public static class RepositoryConfiguration
 {
     public static void AddRepositories(IServiceCollection services)
     {

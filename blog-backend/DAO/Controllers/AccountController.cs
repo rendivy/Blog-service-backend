@@ -29,10 +29,10 @@ public class AccountController : GlobalController
 
     [HttpPost("logout")]
     [Authorize]
-    public async Task LogoutUser()
+    public Task LogoutUser()
     {
         var tokenId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.SerialNumber)?.Value;
-        await _accountService.LogoutUser(tokenId ?? string.Empty);
+        return _accountService.LogoutUser(tokenId ?? string.Empty);
     }
 
     [HttpPost("register")]

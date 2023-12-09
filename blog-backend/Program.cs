@@ -1,4 +1,4 @@
-using blog_backend.Configurator;
+using blog_backend.Configuration;
 using blog_backend.DAO.Database;
 using blog_backend.Service;
 using blog_backend.Service.Middleware;
@@ -12,9 +12,9 @@ builder.Services.AddDbContext<BlogDbContext>(
     options => options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
 builder.Services.AddControllers();
 builder.Services.AddDbContext<GarDbContext>(
-    options => options.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
+    options => options.UseNpgsql(builder.Configuration.GetConnectionString("GarDatabase")));
 
-JwtConfigurator.AddJwt(services: builder.Services, configuration: builder.Configuration);
+JwtConfiguration.AddJwt(services: builder.Services, configuration: builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
 {
@@ -43,8 +43,8 @@ builder.Services.AddSwaggerGen(opt =>
         }
     });
 });
-RepositoryConfigurator.AddRepositories(builder.Services);
-ServiceConfigurator.AddServices(builder.Services);
+RepositoryConfiguration.AddRepositories(builder.Services);
+ServiceConfiguration.AddServices(builder.Services);
 
 
 var app = builder.Build();
