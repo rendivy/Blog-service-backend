@@ -40,12 +40,10 @@ public class AccountRepository : IAccountRepository
         return await Task.FromResult(_dbContext.User.ToList());
     }
 
-    public Task EditUser(User user, string userId)
-    {
-        
+    public async Task EditUser(User user, string userId)
+    { 
         _dbContext.User.Update(user);
-        _dbContext.SaveChanges();
-        return Task.CompletedTask;
+        await _dbContext.SaveChangesAsync();
     }
 
     public Task<User?> GetUserById(string id)
@@ -58,8 +56,8 @@ public class AccountRepository : IAccountRepository
         await _tokenService.SaveExpiredToken(token);
     }
 
-    public Task<User?> GetUserByEmail(string userEmail)
+    public async Task<User?> GetUserByEmail(string userEmail)
     {
-        return _dbContext.User.FirstOrDefaultAsync(u => u.Email == userEmail);
+        return await _dbContext.User.FirstOrDefaultAsync(u => u.Email == userEmail);
     }
 }

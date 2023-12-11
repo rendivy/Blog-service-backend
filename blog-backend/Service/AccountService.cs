@@ -4,9 +4,11 @@ using blog_backend.DAO.Model;
 using blog_backend.DAO.Repository;
 using blog_backend.Entity;
 using blog_backend.Entity.AccountEntities;
+using blog_backend.Service.Extensions;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace blog_backend.Service;
 
@@ -19,7 +21,7 @@ public class AccountService
 
 
     public AccountService(IAccountRepository accountRepository, GenerateTokenService tokenService,
-        BlogDbContext dbContext,  IMapper mapper)
+        BlogDbContext dbContext, IMapper mapper)
     {
         _accountRepository = accountRepository;
         _tokenService = tokenService;
@@ -27,34 +29,27 @@ public class AccountService
         _mapper = mapper;
     }
 
-    public Task<UserAccountDto> GetUserInfo(string userId)
+    public async Task<UserAccountDto> GetUserInfo(string userId)
     {
-        var user = _accountRepository.GetUserById(userId).Result;
+        var user = await userId.GetUserById(_dbContext);
         if (user == null)
         {
             throw new ArgumentException("User not found");
         }
 
-        var dto = new UserAccountDto(
-            user.Id,
-            user.FullName,
-            user.Gender,
-            user.CreateTime,
-            user.Email,
-            user.PhoneNumber,
-            user.DateOfBirth
-        );
-        return Task.FromResult(dto);
+        var userInfoModel = _mapper.Map<UserAccountDto>(user);
+        return userInfoModel;
     }
 
     public async Task EditUser(EditAccountDTO request, string userEmail, string userId)
     {
-        var isEmailBusy = _accountRepository.GetUserByEmail(request.Email).Result;
-        if (isEmailBusy == null)
+        var isEmailBusy = await userEmail.GetUserByEmail(_dbContext);
+        if (isEmailBusy == null || isEmailBusy.Id == new Guid(userId))
         {
-            var user = _accountRepository.GetUserById(userId).Result;
-            var mappedCurrentUser = EditDtoMapper.Map(request, user);
-            await Task.FromResult(_accountRepository.EditUser(mappedCurrentUser, userId));
+            var user = await userId.GetUserById(_dbContext);
+            var mappedCurrentUser = _mapper.Map(request, user);
+            _dbContext.User.Update(mappedCurrentUser);
+            await _dbContext.SaveChangesAsync();
         }
         else
         {
@@ -64,28 +59,42 @@ public class AccountService
 
     public async Task LogoutUser(string token)
     {
-        await _accountRepository.LogoutUser(token);
+        await _tokenService.SaveExpiredToken(token);
     }
 
 
     public async Task<TokenDTO> RegisterUser(AuthorizationDTO request)
     {
-        var existingUser = await _accountRepository.GetUserByEmail(request.Email);
-        if (existingUser != null)
+        if (await request.Email.GetUserByEmail(_dbContext) != null)
         {
             throw new ArgumentException("User already exists");
         }
 
-        var hashPassword =  BCrypt.Net.BCrypt.HashPassword(request.Password);
-        var token = await _accountRepository.Register(request, hashPassword);
-        return  token;
+        try
+        {
+            var hashPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            var user = _mapper.Map<User>(request, opt =>
+                opt.AfterMap((src, dest) => dest.Password = hashPassword));
+            await _dbContext.User.AddAsync(user);
+            await _dbContext.SaveChangesAsync();
+            return new TokenDTO { Token = await _tokenService.GenerateToken(user) };
+        }
+        catch
+        {
+            throw new ArgumentException("Unexpected error");
+        }
     }
 
     public async Task<string> LoginUser(LoginDTO request)
     {
-        var user = _accountRepository.GetUserByEmail(request.Email).Result;
+        var user = await request.Email.GetUserByEmail(_dbContext);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
+        if (user == null)
+        {
+            throw new ArgumentException("Invalid email or password");
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
         {
             throw new ArgumentException("Invalid email or password");
         }

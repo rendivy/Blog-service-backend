@@ -23,7 +23,7 @@ public class GenerateTokenService
         _redisRepository = redisRepository;
     }
 
-    public Task<string> GenerateToken(User user)
+    public async Task<string> GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]);
@@ -43,7 +43,8 @@ public class GenerateTokenService
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var tokenString = tokenHandler.WriteToken(token);
-        return Task.FromResult(tokenString);
+        
+        return tokenString;
     }
 
 

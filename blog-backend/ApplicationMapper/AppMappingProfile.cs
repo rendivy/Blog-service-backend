@@ -8,13 +8,12 @@ public class AppMappingProfile : Profile
 {
     private readonly string _hashPassword;
 
-   
+
     public AppMappingProfile()
     {
-        
         _hashPassword = null;
-
-        
+        CreateMap<EditAccountDTO, User>();
+        CreateMap<User, UserAccountDto>();
         CreateMap<AuthorizationDTO, User>()
             .ForMember(u => u.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(u => u.Password, opt => opt.MapFrom(_ => _hashPassword));

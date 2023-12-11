@@ -60,9 +60,8 @@ public class AccountController : GlobalController
 
     [HttpPost("login")]
     [HandleExceptions]
-    public async Task<IActionResult>  Login([FromBody] LoginDTO request)
+    public async Task<IActionResult> Login([FromBody] LoginDTO request)
     {
-        var token = await _accountService.LoginUser(request);
-        return Ok(new TokenDTO { Token = token });
+        return Ok(new TokenDTO { Token = await _accountService.LoginUser(request)});
     }
 }
