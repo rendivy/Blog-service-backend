@@ -1,8 +1,13 @@
+using AutoMapper;
+using blog_backend.ApplicationMapper;
 using blog_backend.Configuration;
 using blog_backend.DAO.Database;
+using blog_backend.DAO.Model;
+using blog_backend.Entity.AccountEntities;
 using blog_backend.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -17,6 +22,8 @@ builder.Services.AddSingleton<RedisRepository>(
 
 JwtConfiguration.AddJwt(services: builder.Services, configuration: builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAutoMapper(typeof(AppMappingProfile));
+
 builder.Services.AddSwaggerGen(opt =>
 {
     opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });

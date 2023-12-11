@@ -1,3 +1,5 @@
+using AutoMapper;
+using blog_backend.ApplicationMapper;
 using blog_backend.DAO.IService;
 using blog_backend.Service;
 

@@ -17,7 +17,7 @@ public interface IAccountRepository
 
     public Task<User?> GetUserById(string id);
     
-    public void LogoutUser(string token);
+    public Task LogoutUser(string token);
 
     public Task<User?> GetUserByEmail(string userEmail);
 }

@@ -11,18 +11,16 @@ public class RedisRepository
         var connection = ConnectionMultiplexer.Connect(connectionString);
         _database = connection.GetDatabase();
     }
-    
-    public void AddExpiredToken(string tokenId)
+
+    public async Task<bool> AddExpiredToken(string tokenId)
     {
-        var key = $"ExpiredToken:{tokenId}";
-        _database.StringSet(key, "expired", TimeSpan.FromDays(1));
-    }
-    
-    public bool IsTokenExpired(string tokenId)
-    {
-        var key = $"ExpiredToken:{tokenId}";
-        return _database.KeyExists(key);
+        var key = $"ExpiredToken:{tokenId}"; 
+        return await _database.StringSetAsync(key, "expired", TimeSpan.FromDays(1));
     }
 
-    
+    public async Task<bool> IsTokenExpired(string tokenId)
+    {
+        var key = $"ExpiredToken:{tokenId}";
+        return await _database.KeyExistsAsync(key);
+    }
 }

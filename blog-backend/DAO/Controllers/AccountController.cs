@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using AutoMapper;
+using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
 using blog_backend.Entity.AccountEntities;
@@ -15,9 +17,10 @@ public class AccountController : GlobalController
 {
     private readonly AccountService _accountService;
 
-    public AccountController(IAccountRepository accountRepository, GenerateTokenService tokenService)
+    public AccountController(IAccountRepository accountRepository, GenerateTokenService tokenService,
+         IMapper mapper, BlogDbContext dbContext)
     {
-        _accountService = new AccountService(accountRepository, tokenService);
+        _accountService = new AccountService(accountRepository, tokenService, dbContext, mapper);
     }
 
     [HttpGet("profile")]
@@ -37,16 +40,16 @@ public class AccountController : GlobalController
     }
 
     [HttpPost("register")]
-    [HandleExceptions] 
-    public ActionResult<User> Register([FromBody] AuthorizationDTO request)
+    [HandleExceptions]
+    public async Task<IActionResult> Register([FromBody] AuthorizationDTO request)
     {
-        var token = _accountService.RegisterUser(request);
-        return Ok(token.Result);
+        var token = await _accountService.RegisterUser(request);
+        return Ok(token);
     }
 
     [HttpPut("profile")]
     [Authorize]
-    [HandleExceptions] 
+    [HandleExceptions]
     public async Task<IActionResult> EditUser([FromBody] EditAccountDTO user)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -56,10 +59,10 @@ public class AccountController : GlobalController
     }
 
     [HttpPost("login")]
-    [HandleExceptions] 
-    public ActionResult<TokenDTO> Login([FromBody] LoginDTO request)
+    [HandleExceptions]
+    public async Task<IActionResult>  Login([FromBody] LoginDTO request)
     {
-        var token = _accountService.LoginUser(request);
+        var token = await _accountService.LoginUser(request);
         return Ok(new TokenDTO { Token = token });
     }
 }

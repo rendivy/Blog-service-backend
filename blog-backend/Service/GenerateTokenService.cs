@@ -23,7 +23,7 @@ public class GenerateTokenService
         _redisRepository = redisRepository;
     }
 
-    public string GenerateToken(User user)
+    public Task<string> GenerateToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]);
@@ -42,7 +42,8 @@ public class GenerateTokenService
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+        var tokenString = tokenHandler.WriteToken(token);
+        return Task.FromResult(tokenString);
     }
 
 
@@ -53,9 +54,9 @@ public class GenerateTokenService
     }
 
 
-    public void SaveExpiredToken(string tokenId)
+    public async Task SaveExpiredToken(string tokenId)
     {
-        _redisRepository.AddExpiredToken(tokenId);
+        await _redisRepository.AddExpiredToken(tokenId);
     }
 
     private DateTime? GetTokenExpiryDate(string token)

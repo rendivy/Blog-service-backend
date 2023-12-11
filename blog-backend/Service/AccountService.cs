@@ -1,6 +1,9 @@
+using AutoMapper;
+using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.DAO.Repository;
 using blog_backend.Entity;
+using blog_backend.Entity.AccountEntities;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +14,17 @@ public class AccountService
 {
     private readonly IAccountRepository _accountRepository;
     private readonly GenerateTokenService _tokenService;
+    private readonly BlogDbContext _dbContext;
+    private readonly IMapper _mapper;
 
 
-    public AccountService(IAccountRepository accountRepository, GenerateTokenService tokenService)
+    public AccountService(IAccountRepository accountRepository, GenerateTokenService tokenService,
+        BlogDbContext dbContext,  IMapper mapper)
     {
         _accountRepository = accountRepository;
         _tokenService = tokenService;
+        _dbContext = dbContext;
+        _mapper = mapper;
     }
 
     public Task<UserAccountDto> GetUserInfo(string userId)
@@ -50,31 +58,30 @@ public class AccountService
         }
         else
         {
-            throw new ArgumentException("Email is already in use") ;
+            throw new ArgumentException("Email is already in use");
         }
-        
-        
     }
 
     public async Task LogoutUser(string token)
     {
-        await Task.Run(() => _accountRepository.LogoutUser(token));
+        await _accountRepository.LogoutUser(token);
     }
 
 
     public async Task<TokenDTO> RegisterUser(AuthorizationDTO request)
     {
-        if (_accountRepository.GetUserByEmail(request.Email).Result != null)
+        var existingUser = await _accountRepository.GetUserByEmail(request.Email);
+        if (existingUser != null)
         {
             throw new ArgumentException("User already exists");
         }
 
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        var user = _accountRepository.Register(request, passwordHash);
-        return await Task.FromResult(user.Result);
+        var hashPassword =  BCrypt.Net.BCrypt.HashPassword(request.Password);
+        var token = await _accountRepository.Register(request, hashPassword);
+        return  token;
     }
 
-    public string LoginUser(LoginDTO request)
+    public async Task<string> LoginUser(LoginDTO request)
     {
         var user = _accountRepository.GetUserByEmail(request.Email).Result;
 
@@ -83,7 +90,7 @@ public class AccountService
             throw new ArgumentException("Invalid email or password");
         }
 
-        var token = _tokenService.GenerateToken(user);
+        var token = await _tokenService.GenerateToken(user);
         return token;
     }
 }

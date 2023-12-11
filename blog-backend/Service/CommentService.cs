@@ -68,8 +68,8 @@ public class CommentService
     public async Task EditComment(EditCommentDTO editCommentDto, string commentId, string userId)
     {
         var comment = _commentRepository.GetCommentById(new Guid(commentId)).Result;
-        if (comment == null) throw new Exception(CommentNotFoundErrorMessage);
-        if (userId != comment.AuthorId) throw new Exception(NotAuthorOfCommentErrorMessage);
+        if (comment == null) throw new ArgumentException(CommentNotFoundErrorMessage);
+        if (userId != comment.AuthorId) throw new ArgumentException(NotAuthorOfCommentErrorMessage);
         comment.Content = editCommentDto.Content;
         comment.ModifiedDate = DateTime.Now;
         var status = _commentRepository.EditComment(comment);

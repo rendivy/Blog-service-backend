@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "CZgC9nbc3GjJBYBMVNSSStFBXi/t+FZwk6dfxlHS/dpnyplZ7ZhFD3Stk4BaLluKDCLYjQkVnJ9CjW5L/r/nFQ==",
+  "dgSpecHash": "oWXDjDcRr5eV+6O5+tFrDNZ/X65NSA3gRH2bQMkYXHJq9+hAMNDZljBu3vf1kzIfprMjCw6Q8IqNihXVoNIBSQ==",
   "success": true,
   "projectFilePath": "/Users/yuriyyangel/RiderProjects/blog-backend/blog-backend/blog-backend.csproj",
   "expectedPackageFiles": [
+    "/Users/yuriyyangel/.nuget/packages/automapper/12.0.1/automapper.12.0.1.nupkg.sha512",
+    "/Users/yuriyyangel/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/12.0.1/automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
@@ -12,7 +14,7 @@
     "/Users/yuriyyangel/.nuget/packages/microsoft.aspnetcore.cryptography.keyderivation/7.0.14/microsoft.aspnetcore.cryptography.keyderivation.7.0.14.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/microsoft.aspnetcore.identity.entityframeworkcore/7.0.14/microsoft.aspnetcore.identity.entityframeworkcore.7.0.14.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/microsoft.aspnetcore.openapi/7.0.0/microsoft.aspnetcore.openapi.7.0.0.nupkg.sha512",
-    "/Users/yuriyyangel/.nuget/packages/microsoft.csharp/4.5.0/microsoft.csharp.4.5.0.nupkg.sha512",
+    "/Users/yuriyyangel/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/microsoft.entityframeworkcore/7.0.14/microsoft.entityframeworkcore.7.0.14.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/microsoft.entityframeworkcore.abstractions/7.0.14/microsoft.entityframeworkcore.abstractions.7.0.14.nupkg.sha512",
     "/Users/yuriyyangel/.nuget/packages/microsoft.entityframeworkcore.analyzers/7.0.14/microsoft.entityframeworkcore.analyzers.7.0.14.nupkg.sha512",

@@ -5,6 +5,7 @@ using blog_backend.Entity.AccountEntities;
 using blog_backend.Service;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace blog_backend.DAO.Repository;
@@ -25,8 +26,8 @@ public class AccountRepository : IAccountRepository
         var user = AuthDtoMapper.Map(request, hashPassword);
         await _dbContext.User.AddAsync(user);
         await _dbContext.SaveChangesAsync();
-        var token = _tokenService.GenerateToken(user);
-        return await Task.FromResult(new TokenDTO { Token = token });
+        var token = await _tokenService.GenerateToken(user);
+        return new TokenDTO { Token = token };
     }
 
     public Task GetUserName(string userId)
@@ -52,13 +53,13 @@ public class AccountRepository : IAccountRepository
         return Task.FromResult(_dbContext.User.FirstOrDefault(u => u.Id.ToString() == id));
     }
 
-    public void LogoutUser(string token)
+    public async Task LogoutUser(string token)
     {
-        _tokenService.SaveExpiredToken(token);
+        await _tokenService.SaveExpiredToken(token);
     }
 
-    public async Task<User?> GetUserByEmail(string userEmail)
+    public Task<User?> GetUserByEmail(string userEmail)
     {
-        return await Task.FromResult(_dbContext.User.FirstOrDefault(u => u.Email == userEmail));
+        return _dbContext.User.FirstOrDefaultAsync(u => u.Email == userEmail);
     }
 }

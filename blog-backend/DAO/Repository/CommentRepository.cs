@@ -20,9 +20,9 @@ public class CommentRepository : ICommentRepository
         return Task.CompletedTask;
     }
 
-    public Task SaveChangesAsync()
+    public async Task SaveChangesAsync()
     {
-        return _blogDbContext.SaveChangesAsync();
+        await _blogDbContext.SaveChangesAsync();
     }
 
     public Task DeleteComment(Comment comment)

@@ -1,8 +1,6 @@
 using blog_backend.DAO.Model;
 using blog_backend.DAO.Model.Enums;
-using blog_backend.Entity;
 using blog_backend.Entity.PostEntities;
-using blog_backend.Enums;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 
@@ -24,9 +22,6 @@ public class CommunityService
         _commentRepository = commentRepository;
     }
     
-    
-    
-    //TODO: консм
     public Task UnSubscribeUserToCommunity(string communityId, string userId)
     {
         if (communityId == null) throw new ArgumentNullException(nameof(communityId));

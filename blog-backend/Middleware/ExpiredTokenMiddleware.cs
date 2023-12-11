@@ -20,7 +20,7 @@ public class ExpiredTokenMiddleware
         var tokenId = context.User.FindFirstValue(ClaimTypes.SerialNumber);
         if (tokenId != null)
         {
-            var isTokenExpired = _redisRepository.IsTokenExpired(tokenId);
+            var isTokenExpired = await _redisRepository.IsTokenExpired(tokenId);
             if (isTokenExpired)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
