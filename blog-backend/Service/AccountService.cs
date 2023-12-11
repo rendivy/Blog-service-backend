@@ -14,16 +14,13 @@ namespace blog_backend.Service;
 
 public class AccountService
 {
-    private readonly IAccountRepository _accountRepository;
     private readonly GenerateTokenService _tokenService;
     private readonly BlogDbContext _dbContext;
     private readonly IMapper _mapper;
 
 
-    public AccountService(IAccountRepository accountRepository, GenerateTokenService tokenService,
-        BlogDbContext dbContext, IMapper mapper)
+    public AccountService(GenerateTokenService tokenService, BlogDbContext dbContext, IMapper mapper)
     {
-        _accountRepository = accountRepository;
         _tokenService = tokenService;
         _dbContext = dbContext;
         _mapper = mapper;
@@ -79,10 +76,11 @@ public class AccountService
             await _dbContext.SaveChangesAsync();
             return new TokenDTO { Token = await _tokenService.GenerateToken(user) };
         }
-        catch
+        catch (Exception e)
         {
-            throw new ArgumentException("Unexpected error");
+            throw new ArgumentException($"{e.Message}");
         }
+        
     }
 
     public async Task<string> LoginUser(LoginDTO request)

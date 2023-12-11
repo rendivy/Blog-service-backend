@@ -52,7 +52,50 @@ namespace blog_backend.Migrations
                     b.ToTable("PostUser");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.Comment", b =>
+            modelBuilder.Entity("blog_backend.Entity.AccountEntities.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
+
+                    b.ToTable("User");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.CommentEntity.Comment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -101,7 +144,7 @@ namespace blog_backend.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.Community", b =>
+            modelBuilder.Entity("blog_backend.Entity.CommunityEntities.Community", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -130,7 +173,7 @@ namespace blog_backend.Migrations
                     b.ToTable("Communities");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.CommunityMembership", b =>
+            modelBuilder.Entity("blog_backend.Entity.CommunityEntities.CommunityMembership", b =>
                 {
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -162,72 +205,7 @@ namespace blog_backend.Migrations
                     b.ToTable("ExpiredTokens");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.Hierarchy", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AreaCode")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ChangeId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("CityCode")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("EndDate")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<int?>("NextId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ObjectId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ParentId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Path")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("PlaceCode")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("PlanCode")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("PrevId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RegionCode")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("StartDate")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("StreetCode")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UpdatedDate")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Hierarchies");
-                });
-
-            modelBuilder.Entity("blog_backend.Entity.Post", b =>
+            modelBuilder.Entity("blog_backend.Entity.PostEntities.Post", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -274,7 +252,7 @@ namespace blog_backend.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.Tag", b =>
+            modelBuilder.Entity("blog_backend.Entity.PostEntities.Tag", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -292,51 +270,15 @@ namespace blog_backend.Migrations
                     b.ToTable("Tags");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreateTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Gender")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User");
-                });
-
             modelBuilder.Entity("PostTag", b =>
                 {
-                    b.HasOne("blog_backend.Entity.Post", null)
+                    b.HasOne("blog_backend.Entity.PostEntities.Post", null)
                         .WithMany()
                         .HasForeignKey("PostsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("blog_backend.Entity.Tag", null)
+                    b.HasOne("blog_backend.Entity.PostEntities.Tag", null)
                         .WithMany()
                         .HasForeignKey("TagsId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -345,32 +287,32 @@ namespace blog_backend.Migrations
 
             modelBuilder.Entity("PostUser", b =>
                 {
-                    b.HasOne("blog_backend.Entity.Post", null)
+                    b.HasOne("blog_backend.Entity.PostEntities.Post", null)
                         .WithMany()
                         .HasForeignKey("LikedPostsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("blog_backend.Entity.User", null)
+                    b.HasOne("blog_backend.Entity.AccountEntities.User", null)
                         .WithMany()
                         .HasForeignKey("LikedUsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.Comment", b =>
+            modelBuilder.Entity("blog_backend.Entity.CommentEntity.Comment", b =>
                 {
-                    b.HasOne("blog_backend.Entity.Comment", "CommentParent")
+                    b.HasOne("blog_backend.Entity.CommentEntity.Comment", "CommentParent")
                         .WithMany()
                         .HasForeignKey("CommentParentId");
 
-                    b.HasOne("blog_backend.Entity.Post", "Post")
+                    b.HasOne("blog_backend.Entity.PostEntities.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("blog_backend.Entity.User", "User")
+                    b.HasOne("blog_backend.Entity.AccountEntities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -383,15 +325,15 @@ namespace blog_backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.CommunityMembership", b =>
+            modelBuilder.Entity("blog_backend.Entity.CommunityEntities.CommunityMembership", b =>
                 {
-                    b.HasOne("blog_backend.Entity.Community", "Community")
+                    b.HasOne("blog_backend.Entity.CommunityEntities.Community", "Community")
                         .WithMany("Memberships")
                         .HasForeignKey("CommunityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("blog_backend.Entity.User", "User")
+                    b.HasOne("blog_backend.Entity.AccountEntities.User", "User")
                         .WithMany("CommunityMemberships")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -402,28 +344,28 @@ namespace blog_backend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.Post", b =>
+            modelBuilder.Entity("blog_backend.Entity.PostEntities.Post", b =>
                 {
-                    b.HasOne("blog_backend.Entity.Community", null)
+                    b.HasOne("blog_backend.Entity.CommunityEntities.Community", null)
                         .WithMany("Posts")
                         .HasForeignKey("CommunityId");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.Community", b =>
+            modelBuilder.Entity("blog_backend.Entity.AccountEntities.User", b =>
+                {
+                    b.Navigation("CommunityMemberships");
+                });
+
+            modelBuilder.Entity("blog_backend.Entity.CommunityEntities.Community", b =>
                 {
                     b.Navigation("Memberships");
 
                     b.Navigation("Posts");
                 });
 
-            modelBuilder.Entity("blog_backend.Entity.Post", b =>
+            modelBuilder.Entity("blog_backend.Entity.PostEntities.Post", b =>
                 {
                     b.Navigation("Comments");
-                });
-
-            modelBuilder.Entity("blog_backend.Entity.User", b =>
-                {
-                    b.Navigation("CommunityMemberships");
                 });
 #pragma warning restore 612, 618
         }

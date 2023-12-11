@@ -17,11 +17,11 @@ public class AccountController : GlobalController
 {
     private readonly AccountService _accountService;
 
-    public AccountController(IAccountRepository accountRepository, GenerateTokenService tokenService,
-         IMapper mapper, BlogDbContext dbContext)
+    public AccountController(AccountService accountService)
     {
-        _accountService = new AccountService(accountRepository, tokenService, dbContext, mapper);
+        _accountService = accountService;
     }
+
 
     [HttpGet("profile")]
     [Authorize]
@@ -62,6 +62,6 @@ public class AccountController : GlobalController
     [HandleExceptions]
     public async Task<IActionResult> Login([FromBody] LoginDTO request)
     {
-        return Ok(new TokenDTO { Token = await _accountService.LoginUser(request)});
+        return Ok(new TokenDTO { Token = await _accountService.LoginUser(request) });
     }
 }

@@ -26,6 +26,11 @@ public class BlogDbContext : DbContext
     {
         modelBuilder.Entity<CommunityMembership>()
             .HasKey(cm => new { cm.UserId, cm.CommunityId });
+        modelBuilder.Entity<User>().HasIndex(u => u.Email)
+            .IsUnique();
+        modelBuilder.Entity<User>().HasIndex(u => u.PhoneNumber)
+            .IsUnique();
+        
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
