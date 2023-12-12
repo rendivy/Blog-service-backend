@@ -1,4 +1,3 @@
-using blog_backend.DAO.Model;
 using blog_backend.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +13,9 @@ public class AuthorController : GlobalController
     }
 
     [HttpGet("author/list")]
-    public ActionResult<List<AuthorDTO>> GetAuthorList()
+    public async Task<IActionResult> GetAuthorList()
     {
-        var authorList = _authorService.GetAuthorList().Result;
-        if (authorList.Count == 0) return NotFound();
+        var authorList = await _authorService.GetAuthorList();
         return Ok(authorList);
     }
 }
