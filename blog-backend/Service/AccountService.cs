@@ -1,16 +1,10 @@
 using AutoMapper;
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
-using blog_backend.DAO.Repository;
-using blog_backend.Entity;
 using blog_backend.Entity.AccountEntities;
 using blog_backend.Service.Extensions;
-using blog_backend.Service.Mappers;
-using blog_backend.Service.Repository;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-namespace blog_backend.Service;
+namespace blog_backend.Service.Account;
 
 public class AccountService
 {

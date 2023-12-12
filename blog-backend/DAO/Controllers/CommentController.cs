@@ -56,9 +56,8 @@ public class CommentController : GlobalController
     
     
     
-    [HttpPut]
+    [HttpPut("comment/{commentId}")]
     [Authorize]
-    [Route("comment/{commentId}")]
     public async Task<IActionResult> EditComment([FromRoute] string commentId, [FromBody] EditCommentDTO editCommentDto)
     {
         try
