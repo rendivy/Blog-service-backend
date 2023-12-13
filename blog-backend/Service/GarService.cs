@@ -1,9 +1,9 @@
 using blog_backend.DAO.Database;
 using blog_backend.DAO.IService;
 using blog_backend.DAO.Model;
-using blog_backend.DAO.Utils;
 using blog_backend.Entity;
 using blog_backend.Migrations;
+using blog_backend.Service.Account.Extensions;
 using blog_backend.Service.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -85,12 +85,14 @@ public class GarService : IGarService
         if (houseObject == null)
         {
             path = await _garContext.AsAdmHierarchies.Where(obj => obj.Objectid == addressObject.Objectid)
-                .Select(obj => obj.Path).FirstOrDefaultAsync();
+                .Select(obj => obj.Path)
+                .FirstOrDefaultAsync();
         }
         else
         {
             path = await _garContext.AsAdmHierarchies.Where(obj => obj.Objectid == houseObject.Objectid)
-                .Select(obj => obj.Path).FirstOrDefaultAsync();
+                .Select(obj => obj.Path)
+                .FirstOrDefaultAsync();
         }
 
         var pathArray = path?.Split('.').Select(int.Parse).ToList();

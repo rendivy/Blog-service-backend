@@ -1,6 +1,6 @@
 using blog_backend.DAO.Model;
-using blog_backend.DAO.Utils;
-using blog_backend.Entity;
+using blog_backend.DAO.Model.Enums;
+using blog_backend.Entity.PostEntities;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 
@@ -10,21 +10,18 @@ public class CommunityService
 {
     private readonly ICommunityRepository _communityRepository;
     private readonly IAccountRepository _accountRepository;
-    private readonly ICommentRepository _commentRepository;
+    private readonly PostService _postService;
     private readonly IPostRepository _postRepository;
 
     public CommunityService(ICommunityRepository communityRepository, IAccountRepository accountRepository,
-        IPostRepository postRepository, ICommentRepository commentRepository)
+        IPostRepository postRepository, PostService postService)
     {
         _communityRepository = communityRepository;
         _accountRepository = accountRepository;
         _postRepository = postRepository;
-        _commentRepository = commentRepository;
+        _postService = postService;
     }
-    
-    
-    
-    //TODO: консм
+
     public Task UnSubscribeUserToCommunity(string communityId, string userId)
     {
         if (communityId == null) throw new ArgumentNullException(nameof(communityId));
@@ -36,6 +33,13 @@ public class CommunityService
         {
             throw new ArgumentException("Community or user not found");
         }
+
+        //check user role if admin then throw exception
+        if (_communityRepository.GetUserRoleInCommunity(user.Id, community.Id).Result == "Administrator")
+        {
+            throw new ArgumentException("User is admin of this community");
+        }
+
 
         if (!_communityRepository.IsUserSubscribedToCommunity(user.Id, community.Id).Result)
         {
@@ -81,12 +85,12 @@ public class CommunityService
     public async Task<List<CommunityListDTO>> GetUserCommunityList(string userId)
     {
         if (userId == null) throw new ArgumentNullException(nameof(userId));
-    
+
         var user = await _accountRepository.GetUserById(userId);
         if (user == null) throw new ArgumentException("User not found");
-    
+
         var communities = await _communityRepository.GetUserCommunityList(user.Id);
-    
+
         var userList = new List<CommunityListDTO>();
         foreach (var community in communities)
         {
@@ -94,7 +98,7 @@ public class CommunityService
             var communityDto = CommunityMapper.MapToList(community, userId, userRoleInCommunity);
             userList.Add(communityDto);
         }
-    
+
         return userList;
     }
 
@@ -116,10 +120,7 @@ public class CommunityService
             throw new ArgumentException("User is already subscribed to this community");
         }
 
-        var status = _communityRepository.SubscribeUserToCommunity(community, user);
-        if (!status.IsCompleted) throw new ArgumentException("Unknown error");
-        _communityRepository.SaveChangesAsync();
-        return Task.CompletedTask;
+        return _communityRepository.SubscribeUserToCommunity(community, user);
     }
 
 
@@ -159,28 +160,41 @@ public class CommunityService
             var userRole = await _communityRepository.GetUserRoleInCommunity(new Guid(userId), communityId);
             if (userRole == null)
             {
-                throw new ArgumentException("You are not subscribed to this community");
+                throw new ArgumentException("This community is closed and user are not subscribed to it");
             }
         }
-        
-       
+
+
         var postsList = community.Posts!.AsQueryable();
+        if (tags is { Count: > 0 })
+        {
+            postsList = postsList.Where(post => post.Tags!.Any(tag => tags.Contains(tag.Id.ToString())));
+        }
+
         var sortedPostsList = sorting switch
         {
             SortingEnum.CreateDesc => postsList.OrderByDescending(post => post.CreateTime),
             SortingEnum.CreateAsc => postsList.OrderBy(post => post.CreateTime),
             SortingEnum.LikeAsc => postsList.OrderBy(post => post.Likes),
             SortingEnum.LikeDesc => postsList.OrderByDescending(post => post.Likes),
-            _ => throw new ArgumentException ("No argument exception!")
+            _ => throw new ArgumentException("No argument exception!")
         };
-        var paginatedData = sortedPostsList.Skip((page - 1) * size).Take(size);
+
+        var postWithDetails = new List<PostDetailsDTO>();
+        foreach (var post in sortedPostsList)
+        {
+            var postDetails = await _postService.GetPostDetails(post.Id, new Guid(userId));
+            if (postDetails != null) postWithDetails.Add(postDetails);
+        }
+
+        var paginatedData = postWithDetails.Skip((page - 1) * size).Take(size);
         var pagination = new PaginationDTO
         {
             Page = page,
             Size = size,
             Current = paginatedData.Count(),
         };
-        return CommunityMapper.MapCommunityDto(paginatedData.Select(PostMapper.MapDetails).ToList(), pagination);
+        return CommunityMapper.MapCommunityDto(postWithDetails, pagination);
     }
 
 
@@ -206,8 +220,9 @@ public class CommunityService
         var status = _communityRepository.CreateCommunityAsync(community);
         if (status.IsCompletedSuccessfully)
         {
-           return _communityRepository.SaveChangesAsync();
+            return _communityRepository.SaveChangesAsync();
         }
+
         throw new ArgumentException("Unknown error");
     }
 }

@@ -1,30 +1,29 @@
+using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
+using blog_backend.Entity.AccountEntities;
+using blog_backend.Entity.CommentEntity;
+using blog_backend.Service.Extensions;
 using blog_backend.Service.Repository;
 
 namespace blog_backend.Service;
 
 public class CommentService
 {
-    private readonly ICommentRepository _commentRepository;
-    private readonly IAccountRepository _accountRepository;
-    private const string CommentNotFoundErrorMessage = "Comment not found";
-    private const string NotAuthorOfCommentErrorMessage = "You are not the author of this comment";
-    private const string CommentAlreadyDeletedErrorMessage = "Comment already deleted";
+    private readonly BlogDbContext _blogDbContext;
     private const string UserNotFoundErrorMessage = "User not found";
 
-    public CommentService(ICommentRepository commentRepository, IAccountRepository accountRepository)
+    public CommentService(BlogDbContext blogDbContext)
     {
-        _commentRepository = commentRepository;
-        _accountRepository = accountRepository;
+        _blogDbContext = blogDbContext;
     }
 
 
     public async Task<List<CommentDTO>> GetNestedComments(string commentId)
     {
-        var comments = _commentRepository.GetSubComments(Guid.Parse(commentId)).Result;
+        var comments = await Guid.Parse(commentId).GetSubComments(_blogDbContext);
         var commentList = (from comment in comments
-            let subComments = _commentRepository.GetSubComments(comment.Id).Result
+            let subComments = comment.Id.GetSubComments(_blogDbContext)
             select new CommentDTO
             {
                 Id = comment.Id,
@@ -34,7 +33,7 @@ public class CommentService
                 CreateTime = comment.CreatedTime,
                 Author = comment.Author,
                 AuthorId = comment.AuthorId,
-                SubComments = subComments.Count
+                SubComments = subComments.Result.Count
             }).ToList();
         return await Task.FromResult(commentList);
     }
@@ -42,46 +41,103 @@ public class CommentService
 
     public async Task DeleteComment(string commentId, string userId)
     {
-        var comment = _commentRepository.GetCommentById(new Guid(commentId)).Result;
-        if (comment == null) throw new Exception(CommentNotFoundErrorMessage);
-        if (userId != comment.AuthorId) throw new Exception(NotAuthorOfCommentErrorMessage);
-        comment.DeletedTime = DateTime.Now;
-        if (comment.Content == null) throw new Exception(CommentAlreadyDeletedErrorMessage);
-        if (comment.SubComments > 0)
+        try
         {
-            comment.Content = null;
-            await _commentRepository.SaveChangesAsync();
-        }
-        else
-        {
-            var status = _commentRepository.DeleteComment(comment);
-            if (status.IsCompletedSuccessfully)
+            var comment = await Guid.Parse(commentId).GetCommentById(_blogDbContext);
+            if (comment.CommentParent != null)
             {
-                await _commentRepository.SaveChangesAsync();
+                await DeleteChildComment(commentId, userId);
             }
+            else await DeleteRouteComment(commentId, userId);
+        }
+        catch (Exception e)
+        {
+            throw new ArgumentException($"Unexpected error while deleting comment: {e.Message}");
+        }
+    }
+
+
+    private async Task DeleteChildComment(string commentId, string userId)
+    {
+        try
+        {
+            var comment = await Guid.Parse(commentId).GetCommentById(_blogDbContext);
+            var parentComment = await comment.CommentParent.Id.GetCommentById(_blogDbContext);
+            CommentServiceExtension.ValidateCommentRequest(comment, userId);
+            if (comment.SubComments > 0)
+            {
+                comment.DeletedTime = DateTime.Now;
+                comment.Content = null;
+            }
+            else
+            {
+                _blogDbContext.Comments.Remove(comment);
+            }
+
+            parentComment.SubComments--;
+            if (parentComment.SubComments == 0)
+            {
+                _blogDbContext.Comments.Remove(parentComment);
+            }
+            else
+            {
+                _blogDbContext.Comments.Update(parentComment);
+            }
+            await _blogDbContext.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new ArgumentException($"Unexpected error while deleting comment: {e.Message}");
+        }
+    }
+
+    private async Task DeleteRouteComment(string commentId, string userId)
+    {
+        try
+        {
+            var comment = await Guid.Parse(commentId).GetCommentById(_blogDbContext);
+            CommentServiceExtension.ValidateCommentRequest(comment, userId);
+
+            if (comment.SubComments > 0)
+            {
+                comment.DeletedTime = DateTime.Now;
+                comment.Content = null;
+            }
+            else _blogDbContext.Comments.Remove(comment);
+
+            await _blogDbContext.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new ArgumentException($"Unexpected error while deleting comment: {e.Message}");
         }
     }
 
 
     public async Task EditComment(EditCommentDTO editCommentDto, string commentId, string userId)
     {
-        var comment = _commentRepository.GetCommentById(new Guid(commentId)).Result;
-        if (comment == null) throw new Exception(CommentNotFoundErrorMessage);
-        if (userId != comment.AuthorId) throw new Exception(NotAuthorOfCommentErrorMessage);
-        comment.Content = editCommentDto.Content;
-        comment.ModifiedDate = DateTime.Now;
-        var status = _commentRepository.EditComment(comment);
-        if (status.IsCompletedSuccessfully)
+        try
         {
-            await _commentRepository.SaveChangesAsync();
+            var comment = await Guid.Parse(commentId).GetCommentById(_blogDbContext);
+            CommentServiceExtension.ValidateCommentRequest(comment, userId);
+
+            comment.Content = editCommentDto.Content;
+            comment.ModifiedDate = DateTime.Now;
+
+            _blogDbContext.Comments.Update(comment);
+            await _blogDbContext.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new ArgumentException($"Unexpected error while editing comment: {e.Message}");
         }
     }
 
 
     public async Task CreateComment(AddCommentDTO addCommentDto, string postId, string userId)
     {
-        var user = await _accountRepository.GetUserById(userId);
-        if (user == null) throw new Exception( UserNotFoundErrorMessage);
+        var user = await userId.GetUserById(_blogDbContext);
+        if (user == null) throw new Exception(UserNotFoundErrorMessage);
         if (addCommentDto.ParentId == null || addCommentDto.ParentId == Guid.Empty)
         {
             await CreateRootComment(addCommentDto, postId, user);
@@ -94,75 +150,62 @@ public class CommentService
 
     private async Task CreateRootComment(AddCommentDTO addCommentDto, string postId, User user)
     {
-        var comment = new Comment
+        try
         {
-            Id = Guid.NewGuid(),
-            PostId = Guid.Parse(postId),
-            CreatedTime = DateTime.Now,
-            ModifiedDate = null,
-            DeletedTime = null,
-            User = user,
-            Content = addCommentDto.Content,
-            Author = user.FullName,
-            AuthorId = user.Id.ToString(),
-            CommentParent = null
-        };
-
-        var status = _commentRepository.CreateComment(comment);
-        if (status.IsCompletedSuccessfully)
+            var comment = new Comment
+            {
+                Id = Guid.NewGuid(),
+                PostId = Guid.Parse(postId),
+                CreatedTime = DateTime.Now,
+                ModifiedDate = null,
+                DeletedTime = null,
+                User = user,
+                Content = addCommentDto.Content,
+                Author = user.FullName,
+                AuthorId = user.Id.ToString(),
+                CommentParent = null
+            };
+            await _blogDbContext.Comments.AddAsync(comment);
+            await _blogDbContext.SaveChangesAsync();
+        }
+        catch (Exception e)
         {
-            await _commentRepository.SaveChangesAsync();
+            throw new ArgumentException($"Unexpected error while creating comment: {e.Message}");
         }
     }
 
     private async Task CreateChildComment(AddCommentDTO addCommentDto, string postId, User user)
     {
-        var parentComment = await _commentRepository.GetCommentById(addCommentDto.ParentId);
-
-        if (parentComment != null)
+        try
         {
-            parentComment.SubComments++;
-        }
-
-        var comment = new Comment
-        {
-            Id = Guid.NewGuid(),
-            PostId = Guid.Parse(postId),
-            CreatedTime = DateTime.Now,
-            ModifiedDate = null,
-            DeletedTime = null,
-            User = user,
-            Content = addCommentDto.Content,
-            Author = user.FullName,
-            AuthorId = user.Id.ToString(),
-            CommentParent = parentComment
-        };
-
-        var status = _commentRepository.CreateComment(comment);
-
-        if (status.IsCompletedSuccessfully)
-        {
-            await _commentRepository.SaveChangesAsync();
-        }
-    }
-
-
-    public Task<List<CommentDTO>> GetCommentsByPostId(Guid postId)
-    {
-        var comments = _commentRepository.GetCommentsByPostId(postId).Result;
-        var commentList = (from comment in comments
-            let subComments = _commentRepository.GetSubComments(comment.Id).Result
-            select new CommentDTO
+            var parentComment = await addCommentDto.ParentId?.GetCommentById(_blogDbContext)!;
+            if (parentComment != null)
             {
-                Id = comment.Id,
-                ModifiedDate = comment.ModifiedDate,
-                DeleteDate = comment.DeletedTime,
-                Content = comment.Content,
-                CreateTime = comment.CreatedTime,
-                Author = comment.Author,
-                AuthorId = comment.AuthorId,
-                SubComments = subComments.Count
-            }).ToList();
-        return Task.FromResult(commentList);
+                parentComment.SubComments++;
+                var comment = new Comment
+                {
+                    Id = Guid.NewGuid(),
+                    PostId = Guid.Parse(postId),
+                    CreatedTime = DateTime.Now,
+                    ModifiedDate = null,
+                    DeletedTime = null,
+                    User = user,
+                    Content = addCommentDto.Content,
+                    Author = user.FullName,
+                    AuthorId = user.Id.ToString(),
+                    CommentParent = parentComment
+                };
+                await _blogDbContext.Comments.AddAsync(comment);
+                await _blogDbContext.SaveChangesAsync();
+            }
+            else
+            {
+                throw new ArgumentException("Parent comment not found");
+            }
+        }
+        catch (Exception e)
+        {
+            throw new ArgumentException($"Unexpected error while creating comment: {e.Message}");
+        }
     }
 }

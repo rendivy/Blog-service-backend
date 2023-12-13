@@ -1,13 +1,14 @@
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
+using blog_backend.Entity.PostEntities;
 
 namespace blog_backend.Service.Mappers;
 
 public static class PostMapper
 {
-    public static PostDTO MapDetails(Post post)
+    public static PostDetailsDTO MapDetails(Post post)
     {
-        var postDto = new PostDTO
+        var postDto = new PostDetailsDTO
         {
             Id = post.Id,
             CreateTime = post.CreateTime,
@@ -30,6 +31,15 @@ public static class PostMapper
         return postDto;
     }
     
+    public static PostDTO MapToDTO(List<PostDetailsDTO> posts, PaginationDTO paginationDTO)
+    {
+        return new PostDTO
+        {
+            Posts = posts,
+            Pagination = paginationDTO
+        };
+    }
+    
     public static Post Map(CreatePostDTO postDto, List<Tag> tags, string userName, string userId)
     {
         var post = new Post
@@ -39,6 +49,7 @@ public static class PostMapper
             ReadingTime = postDto.ReadingTime,
             Image = postDto.Image,
             Author = userName,
+            AddressId = postDto.AddressId,
             AuthorId = new Guid(userId),
             Tags = tags
         };

@@ -1,4 +1,5 @@
 using blog_backend.Entity;
+using blog_backend.Entity.PostEntities;
 
 namespace blog_backend.Service.Repository;
 

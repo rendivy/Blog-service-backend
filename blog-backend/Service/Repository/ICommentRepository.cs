@@ -1,11 +1,11 @@
 using blog_backend.Entity;
+using blog_backend.Entity.CommentEntity;
 
 namespace blog_backend.Service.Repository;
 
 public interface ICommentRepository
 {
-    public  Task CreateComment(Comment comment);
-    
+    public Task CreateComment(Comment comment);
     public Task SaveChangesAsync();
     public Task DeleteComment(Comment comment);
     public Task EditComment(Comment comment);

@@ -1,8 +1,12 @@
 using System.Security.Claims;
+using AutoMapper;
+using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
+using blog_backend.Entity.AccountEntities;
+using blog_backend.Middleware;
 using blog_backend.Service;
-using blog_backend.Service.Middleware;
+using blog_backend.Service.Account;
 using blog_backend.Service.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +18,11 @@ public class AccountController : GlobalController
 {
     private readonly AccountService _accountService;
 
-    public AccountController(IAccountRepository accountRepository, GenerateTokenService tokenService)
+    public AccountController(AccountService accountService)
     {
-        _accountService = new AccountService(accountRepository, tokenService);
+        _accountService = accountService;
     }
+
 
     [HttpGet("profile")]
     [Authorize]
@@ -36,16 +41,16 @@ public class AccountController : GlobalController
     }
 
     [HttpPost("register")]
-    [HandleExceptions] 
-    public ActionResult<User> Register([FromBody] AuthorizationDTO request)
+    [HandleExceptions]
+    public async Task<IActionResult> Register([FromBody] AuthorizationDTO request)
     {
-        var token = _accountService.RegisterUser(request);
-        return Ok(token.Result);
+        var token = await _accountService.RegisterUser(request);
+        return Ok(token);
     }
 
     [HttpPut("profile")]
     [Authorize]
-    [HandleExceptions] 
+    [HandleExceptions]
     public async Task<IActionResult> EditUser([FromBody] EditAccountDTO user)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
@@ -55,10 +60,9 @@ public class AccountController : GlobalController
     }
 
     [HttpPost("login")]
-    [HandleExceptions] 
-    public ActionResult<TokenDTO> Login([FromBody] LoginDTO request)
+    [HandleExceptions]
+    public async Task<IActionResult> Login([FromBody] LoginDTO request)
     {
-        var token = _accountService.LoginUser(request);
-        return Ok(new TokenDTO { Token = token });
+        return Ok(new TokenDTO { Token = await _accountService.LoginUser(request) });
     }
 }

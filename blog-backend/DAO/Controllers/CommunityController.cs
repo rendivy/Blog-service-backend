@@ -1,7 +1,8 @@
 using System.ComponentModel;
 using System.Security.Claims;
 using blog_backend.DAO.Model;
-using blog_backend.DAO.Utils;
+using blog_backend.DAO.Model.Enums;
+using blog_backend.Enums;
 using blog_backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ public class CommunityController : GlobalController
     [HttpGet("community/{communityId}/post")]
     public async Task<IActionResult> GetCommunityPostList(Guid communityId,
         [FromQuery] List<string>? tags,
-        [FromQuery] SortingEnum? sorting,
+        [FromQuery] SortingEnum? sorting = SortingEnum.CreateAsc,
         [FromQuery] int page = 1,
         [FromQuery] int size = 5)
     {

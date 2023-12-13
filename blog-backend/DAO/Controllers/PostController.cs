@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using blog_backend.DAO.Model;
+using blog_backend.DAO.Model.Enums;
 using blog_backend.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,18 @@ public class PostController : GlobalController
         _postService = postService;
     }
 
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetPosts([FromQuery] int size = 5, [FromQuery] int page = 1,
+        [FromQuery] string author = null, [FromQuery] int? minimumReadingTime = null,
+        [FromQuery] int? maximumReadingTime = null, [FromQuery] SortingEnum sorting = SortingEnum.CreateDesc,
+        [FromQuery] bool onlyMyCommunities = false)
+    {
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        var posts = await _postService.GetPostWithPagination(new Guid(userId), size, page, author,
+            maximumReadingTime, minimumReadingTime, sorting, onlyMyCommunities);
+        return Ok(posts);
+    }
 
     [Authorize]
     [HttpGet("{id}")]
@@ -49,9 +62,6 @@ public class PostController : GlobalController
             return BadRequest(error);
         }
     }
-    
-    
-    
 
 
     [Authorize]

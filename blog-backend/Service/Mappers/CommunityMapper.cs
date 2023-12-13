@@ -1,6 +1,8 @@
 using blog_backend.DAO.Model;
-using blog_backend.DAO.Utils;
 using blog_backend.Entity;
+using blog_backend.Entity.AccountEntities;
+using blog_backend.Entity.CommunityEntities;
+using blog_backend.Enums;
 
 namespace blog_backend.Service.Mappers;
 
@@ -20,7 +22,7 @@ public class CommunityMapper
     }
     
     
-    public static CommunityDTO MapCommunityDto(List<PostDTO> posts, PaginationDTO paginationDTO)
+    public static CommunityDTO MapCommunityDto(List<PostDetailsDTO> posts, PaginationDTO paginationDTO)
     {
         return new CommunityDTO
         {

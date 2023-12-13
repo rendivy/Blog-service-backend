@@ -1,5 +1,6 @@
 using blog_backend.DAO.Model;
 using blog_backend.Entity;
+using blog_backend.Entity.CommentEntity;
 
 namespace blog_backend.Service.Mappers;
 

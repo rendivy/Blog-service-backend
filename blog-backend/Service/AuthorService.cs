@@ -1,36 +1,47 @@
+using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.Service.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace blog_backend.Service;
 
 public class AuthorService
 {
-    private readonly IPostRepository _postRepository;
-    private readonly IAccountRepository _accountRepository;
+    private readonly BlogDbContext _dbContext;
 
-    public AuthorService(IPostRepository postRepository, IAccountRepository accountRepository)
+    public AuthorService(BlogDbContext dbContext)
     {
-        _postRepository = postRepository;
-        _accountRepository = accountRepository;
+        _dbContext = dbContext;
     }
 
-    public Task<List<AuthorDTO>> GetAuthorList()
+    public async Task<List<AuthorDTO>> GetAuthorList()
     {
-        var authors = _accountRepository.GetAuthors().Result;
-        
-        var authorList = (from author in authors
-            let posts = _postRepository.GetPostsByAuthor(author.Id.ToString()).Result
-            where posts.Count > 0
-            select new AuthorDTO
+        var authors = await _dbContext.User.ToListAsync();
+
+        var authorList = new List<AuthorDTO>();
+
+        foreach (var author in authors)
+        {
+            var posts = await _dbContext.Posts
+                .Where(p => p.AuthorId.ToString() == author.Id.ToString())
+                .ToListAsync();
+
+            if (posts.Count <= 0) continue;
             {
-                FullName = author.FullName,
-                BirthDate = author.DateOfBirth,
-                Posts = posts.Count,
-                Created = author.CreateTime,
-                Gender = author.Gender,
-                Likes = posts.Sum(p => p.Likes)
-            }).ToList();
-        
-        return Task.FromResult(authorList);
+                var authorDto = new AuthorDTO
+                {
+                    FullName = author.FullName,
+                    BirthDate = author.DateOfBirth,
+                    Posts = posts.Count,
+                    Created = author.CreateTime,
+                    Gender = author.Gender,
+                    Likes = posts.Sum(p => p.Likes)
+                };
+
+                authorList.Add(authorDto);
+            }
+        }
+
+        return await Task.FromResult(authorList);
     }
 }
