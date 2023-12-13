@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using AutoMapper;
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
@@ -18,6 +19,32 @@ public class AccountService
         _tokenService = tokenService;
         _dbContext = dbContext;
         _mapper = mapper;
+    }
+
+    private void ValidateUserCredentials(string password, string email, string? phoneNumber)
+    {
+        if (password.Length < 6)
+        {
+            throw new ArgumentException("Password must be at least 6 characters");
+        }
+
+        if (password.Length > 20)
+        {
+            throw new ArgumentException("Password must be less than 20 characters");
+        }
+
+        if (!Regex.IsMatch(email, "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"))
+        {
+            throw new ArgumentException("Invalid email pattern");
+        }
+
+        if (phoneNumber != null)
+        {
+            if (!Regex.IsMatch(phoneNumber, "^\\+7\\d{10}$"))
+            {
+                throw new ArgumentException("Invalid phone pattern");
+            }
+        }
     }
 
     public async Task<UserAccountDto> GetUserInfo(string userId)
@@ -60,12 +87,13 @@ public class AccountService
         {
             throw new ArgumentException("User already exists");
         }
-
+        ValidateUserCredentials(request.Password, request.Email, request.PhoneNumber);
         try
         {
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
             var user = _mapper.Map<User>(request, opt =>
                 opt.AfterMap((src, dest) => dest.Password = hashPassword));
+
             await _dbContext.User.AddAsync(user);
             await _dbContext.SaveChangesAsync();
             return new TokenDTO { Token = await _tokenService.GenerateToken(user) };
@@ -74,7 +102,6 @@ public class AccountService
         {
             throw new ArgumentException($"{e.Message}");
         }
-        
     }
 
     public async Task<string> LoginUser(LoginDTO request)
