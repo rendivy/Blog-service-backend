@@ -14,6 +14,7 @@ public class Post
     public string Image { get; set; }
     [Required] public Guid AuthorId { get; set; }
     [Required] public string Author { get; set; }
+    public string? AddressId { get; set; }
     public Guid? CommunityId { get; set; } = null;
     public string? CommunityName { get; set; } = null;
     public int Likes { get; set; }

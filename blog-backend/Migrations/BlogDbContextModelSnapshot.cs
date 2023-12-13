@@ -211,6 +211,9 @@ namespace blog_backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("AddressId")
+                        .HasColumnType("text");
+
                     b.Property<string>("Author")
                         .IsRequired()
                         .HasColumnType("text");

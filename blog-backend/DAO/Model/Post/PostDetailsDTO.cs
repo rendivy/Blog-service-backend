@@ -12,6 +12,7 @@ public class PostDetailsDTO
     public string Image { get; set; }
     public Guid AuthorId { get; set; }
     public string Author { get; set; }
+    public string? AddressId { get; set; } = null;
     public Guid? CommunityId { get; set; } = null;
     public string? CommunityName { get; set; } = null;
     public int Likes { get; set; } = 0;

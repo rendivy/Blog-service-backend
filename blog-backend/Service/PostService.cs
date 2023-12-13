@@ -117,6 +117,7 @@ public class PostService
             CommunityName = community?.Name,
             CommunityId = community?.Id,
             Author = post.Author,
+            AddressId = post.AddressId,
             Comments = comment,
             Likes = post.LikedUsers.Count,
             HasLike = post.LikedUsers.Any(u => u.Id == userId),
