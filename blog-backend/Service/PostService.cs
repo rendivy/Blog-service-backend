@@ -90,15 +90,19 @@ public class PostService
         }
 
         var community = await _communityRepository.GetCommunityById(post.CommunityId);
-        if (community.IsClosed)
+        if (post.CommunityId != null)
         {
-            var isUserMember = _blogDbContext.CommunityMemberships.Any(cm =>
-                cm.UserId == userId && cm.CommunityId == community.Id);
-            if (!isUserMember)
+            if (community.IsClosed)
             {
-                throw new Exception("User is not a member of this community");
+                var isUserMember = _blogDbContext.CommunityMemberships.Any(cm =>
+                    cm.UserId == userId && cm.CommunityId == community.Id);
+                if (!isUserMember)
+                {
+                    throw new Exception("User is not a member of this community");
+                }
             }
         }
+        
         var comment = post.Comments.Where(c => c.CommentParent == null).Select(CommentMapper.Map).ToList();
 
         var postDto = new PostDetailsDTO
