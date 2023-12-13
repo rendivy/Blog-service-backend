@@ -49,6 +49,7 @@ public static class PostMapper
             ReadingTime = postDto.ReadingTime,
             Image = postDto.Image,
             Author = userName,
+            AddressId = postDto.AddressId,
             AuthorId = new Guid(userId),
             Tags = tags
         };
