@@ -145,6 +145,18 @@ public class PostService
     {
         var post = await _postRepository.GetPostDetails(postId);
         var user = await _accountRepository.GetUserById(userId.ToString());
+        var community = post?.CommunityId != null
+            ? await _communityRepository.GetCommunityById(post.CommunityId.Value)
+            : null;
+        if (community is { IsClosed: true })
+        {
+            var isUserMember = _blogDbContext.CommunityMemberships.Any(cm =>
+                cm.UserId == userId && cm.CommunityId == community.Id);
+            if (!isUserMember)
+            {
+                throw new Exception("User is not a member of this community");
+            }
+        }
         var isUserLiked = post?.LikedUsers?.Any(u => u.Id == userId);
 
         if (isUserLiked == null || isUserLiked.Value)
@@ -165,6 +177,18 @@ public class PostService
     {
         var post = await _postRepository.GetPostDetails(postId);
         var user = await _accountRepository.GetUserById(userId.ToString());
+        var community = post?.CommunityId != null
+            ? await _communityRepository.GetCommunityById(post.CommunityId.Value)
+            : null;
+        if (community is { IsClosed: true })
+        {
+            var isUserMember = _blogDbContext.CommunityMemberships.Any(cm =>
+                cm.UserId == userId && cm.CommunityId == community.Id);
+            if (!isUserMember)
+            {
+                throw new Exception("User is not a member of this community");
+            }
+        }
         var isUserLiked = post?.LikedUsers?.Any(u => u.Id == userId);
         if (isUserLiked == null || !isUserLiked.Value)
         {

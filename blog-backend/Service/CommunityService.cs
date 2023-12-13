@@ -14,7 +14,7 @@ public class CommunityService
     private readonly IPostRepository _postRepository;
 
     public CommunityService(ICommunityRepository communityRepository, IAccountRepository accountRepository,
-        IPostRepository postRepository,  PostService postService)
+        IPostRepository postRepository, PostService postService)
     {
         _communityRepository = communityRepository;
         _accountRepository = accountRepository;
@@ -33,6 +33,13 @@ public class CommunityService
         {
             throw new ArgumentException("Community or user not found");
         }
+
+        //check user role if admin then throw exception
+        if (_communityRepository.GetUserRoleInCommunity(user.Id, community.Id).Result == "Administrator")
+        {
+            throw new ArgumentException("User is admin of this community");
+        }
+
 
         if (!_communityRepository.IsUserSubscribedToCommunity(user.Id, community.Id).Result)
         {
@@ -113,10 +120,7 @@ public class CommunityService
             throw new ArgumentException("User is already subscribed to this community");
         }
 
-        var status = _communityRepository.SubscribeUserToCommunity(community, user);
-        if (!status.IsCompleted) throw new ArgumentException("Unknown error");
-        _communityRepository.SaveChangesAsync();
-        return Task.CompletedTask;
+        return _communityRepository.SubscribeUserToCommunity(community, user);
     }
 
 
@@ -175,7 +179,7 @@ public class CommunityService
             SortingEnum.LikeDesc => postsList.OrderByDescending(post => post.Likes),
             _ => throw new ArgumentException("No argument exception!")
         };
-        
+
         var postWithDetails = new List<PostDetailsDTO>();
         foreach (var post in sortedPostsList)
         {

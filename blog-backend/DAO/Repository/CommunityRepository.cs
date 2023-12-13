@@ -77,15 +77,21 @@ public class CommunityRepository : ICommunityRepository
             .Any(membership => membership.UserId == userId && membership.CommunityId == communityId));
     }
 
-    public Task SubscribeUserToCommunity(Community community, User user)
+    public async Task SubscribeUserToCommunity(Community community, User user)
     {
         community.SubscribersCount++;
-        community.Memberships?.Add(new CommunityMembership
+
+        if (community.Memberships == null)
+        {
+            community.Memberships = new List<CommunityMembership>();
+        }
+
+        community.Memberships.Add(new CommunityMembership
         {
             UserId = user.Id,
             RoleEnum = RoleEnum.Subscriber
         });
-        return Task.CompletedTask;
+        await _databaseContext.SaveChangesAsync();
     }
 
     public Task UnSubscribeUserFromCommunity(Community community, User user)
@@ -96,7 +102,8 @@ public class CommunityRepository : ICommunityRepository
         {
             community.Memberships?.Remove(membership);
         }
-
+        _databaseContext.CommunityMemberships.Remove(membership!);
+        _databaseContext.SaveChangesAsync();
         return Task.CompletedTask;
     }
 }
