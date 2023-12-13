@@ -177,6 +177,7 @@ public class CommunityService
             SortingEnum.LikeDesc => postsList.OrderByDescending(post => post.Likes),
             _ => throw new ArgumentException("No argument exception!")
         };
+        
         var postWithDetails = new List<PostDetailsDTO>();
         foreach (var post in sortedPostsList)
         {

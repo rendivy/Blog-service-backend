@@ -31,6 +31,15 @@ public static class PostMapper
         return postDto;
     }
     
+    public static PostDTO MapToDTO(List<PostDetailsDTO> posts, PaginationDTO paginationDTO)
+    {
+        return new PostDTO
+        {
+            Posts = posts,
+            Pagination = paginationDTO
+        };
+    }
+    
     public static Post Map(CreatePostDTO postDto, List<Tag> tags, string userName, string userId)
     {
         var post = new Post

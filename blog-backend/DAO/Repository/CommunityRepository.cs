@@ -67,8 +67,7 @@ public class CommunityRepository : ICommunityRepository
             .ThenInclude(post => post.Tags)
             .Include(community => community.Posts)
             .ThenInclude(post => post.Comments)
-            .ThenInclude(comment => comment.User)
-            .AsQueryable()
+            .ThenInclude(comment => comment.User).AsQueryable()
             .FirstOrDefaultAsync(community => community.Id == communityId);
     }
 
