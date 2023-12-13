@@ -36,7 +36,7 @@ public class CommunityController : GlobalController
     [HttpGet("community/{communityId}/post")]
     public async Task<IActionResult> GetCommunityPostList(Guid communityId,
         [FromQuery] List<string>? tags,
-        [FromQuery] SortingEnum? sorting,
+        [FromQuery] SortingEnum? sorting = SortingEnum.CreateAsc,
         [FromQuery] int page = 1,
         [FromQuery] int size = 5)
     {

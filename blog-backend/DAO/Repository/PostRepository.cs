@@ -26,9 +26,11 @@ public class PostRepository : IPostRepository
     }
 
 
-    public async Task<Post?> GetPostDetails(Guid postId)
+    public Task<Post?> GetPostDetails(Guid postId)
     {
-        return await _databaseContext.Posts.Include(p => p.Tags).Include(post => post.LikedUsers)
+        return _databaseContext.Posts
+            .Include(p => p.Tags)
+            .Include(post => post.LikedUsers)
             .Include(comment => comment.Comments)
             .FirstOrDefaultAsync(p => p.Id == postId);
     }
