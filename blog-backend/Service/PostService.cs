@@ -24,8 +24,8 @@ public class PostService
     }
 
 
-    public async Task<List<PostDetailsDTO>> GetPostWithPagination(Guid userId, int size, int page, string author,
-        int? maximumReadingTime, int? minimumReadingTime, SortingEnum sorting, bool onlyMyCommunities)
+    public async Task<PostDTO> GetPostWithPagination(Guid userId, int size, int page, string author,
+        int? maximumReadingTime, int? minimumReadingTime, SortingEnum sorting, bool onlyMyCommunities, List<string>? tags)
     {
         var posts = _blogDbContext.Posts.AsQueryable();
         var user = await userId.ToString().GetUserById(_blogDbContext);
@@ -65,7 +65,10 @@ public class PostService
 
         posts = posts.Where(p => !closedCommunityIds.Contains(p.CommunityId.Value) || userCommunityIds.Contains(p.CommunityId.Value));
         
-        
+        if (tags is { Count: > 0 })
+        {
+            posts = posts.Where(post => post.Tags!.Any(tag => tags.Contains(tag.Id.ToString())));
+        }
 
         var postsList = await posts.ToListAsync();
         var postWithDetails = new List<PostDetailsDTO>();
@@ -77,8 +80,15 @@ public class PostService
                 postWithDetails.Add(details);
             }
         }
+        var paginatedData = postWithDetails.Skip((page - 1) * size).Take(size);
+        var pagination = new PaginationDTO
+        {
+            Page = page,
+            Size = size,
+            Current = paginatedData.Count(),
+        };
 
-        return postWithDetails;
+        return PostMapper.MapToDTO(postWithDetails, pagination);
     }
 
     public async Task<PostDetailsDTO?> GetPostDetails(Guid postId, Guid userId)

@@ -20,13 +20,13 @@ public class PostController : GlobalController
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetPosts([FromQuery] int size = 5, [FromQuery] int page = 1,
-        [FromQuery] string author = null, [FromQuery] int? minimumReadingTime = null,
+        [FromQuery] string? author = null, [FromQuery] int? minimumReadingTime = null,
         [FromQuery] int? maximumReadingTime = null, [FromQuery] SortingEnum sorting = SortingEnum.CreateDesc,
-        [FromQuery] bool onlyMyCommunities = false)
+        [FromQuery] bool onlyMyCommunities = false, [FromQuery] List<string>? tags = null)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
         var posts = await _postService.GetPostWithPagination(new Guid(userId), size, page, author,
-            maximumReadingTime, minimumReadingTime, sorting, onlyMyCommunities);
+            maximumReadingTime, minimumReadingTime, sorting, onlyMyCommunities, tags);
         return Ok(posts);
     }
 
