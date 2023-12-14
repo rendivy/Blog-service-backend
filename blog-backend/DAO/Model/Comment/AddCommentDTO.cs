@@ -1,4 +1,4 @@
-namespace blog_backend.DAO.Model;
+namespace blog_backend.DAO.Model.Comment;
 
 public class AddCommentDTO
 {

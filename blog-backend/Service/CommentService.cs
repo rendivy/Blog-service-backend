@@ -1,5 +1,6 @@
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
+using blog_backend.DAO.Model.Comment;
 using blog_backend.Entity;
 using blog_backend.Entity.AccountEntities;
 using blog_backend.Entity.CommentEntity;
