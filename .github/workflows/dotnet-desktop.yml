@@ -77,11 +77,6 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
 
-
-
-    # Restore the application to populate the obj folder with RuntimeIdentifiers
-ё
-
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
       run: |
