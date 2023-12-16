@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using AutoMapper;
 using blog_backend.DAO.Database;
+using blog_backend.DAO.IService;
 using blog_backend.DAO.Model;
 using blog_backend.DAO.Model.Account;
 using blog_backend.Entity;
@@ -17,9 +18,9 @@ namespace blog_backend.DAO.Controllers;
 [ApiController]
 public class AccountController : GlobalController
 {
-    private readonly AccountService _accountService;
+    private readonly IAccountService _accountService;
 
-    public AccountController(AccountService accountService)
+    public AccountController(IAccountService accountService)
     {
         _accountService = accountService;
     }

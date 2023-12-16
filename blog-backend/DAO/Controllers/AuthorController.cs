@@ -1,3 +1,4 @@
+using blog_backend.DAO.IService;
 using blog_backend.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -5,9 +6,9 @@ namespace blog_backend.DAO.Controllers;
 
 public class AuthorController : GlobalController
 {
-    private readonly AuthorService _authorService;
+    private readonly IAuthorService _authorService;
 
-    public AuthorController(AuthorService authorService)
+    public AuthorController(IAuthorService authorService)
     {
         _authorService = authorService;
     }
