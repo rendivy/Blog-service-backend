@@ -1,11 +1,12 @@
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.DAO.Model.Enums;
-using blog_backend.Enums;
 using blog_backend.Service.Extensions;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 using Microsoft.EntityFrameworkCore;
+
+namespace blog_backend.Service;
 
 public class PostService
 {
@@ -24,12 +25,15 @@ public class PostService
     }
 
 
-    public async Task<PostDTO> GetPostWithPagination(Guid userId, int size, int page, string author,
+    public async Task<PostDTO> GetPostWithPagination(Guid userId, int size, int page, string? author,
         int? maximumReadingTime, int? minimumReadingTime, SortingEnum sorting, bool onlyMyCommunities, List<string>? tags)
     {
         var posts = _blogDbContext.Posts.AsQueryable();
         var user = await userId.ToString().GetUserById(_blogDbContext);
-        //sort by author name
+        if (size <= 0) throw new ArgumentException("Invalid size value");
+        if (page <= 0) throw new ArgumentException("Invalid page value");
+        
+        
         if (author != null)
         {
             posts = posts.Where(p => p.Author == author);
@@ -69,8 +73,9 @@ public class PostService
         {
             posts = posts.Where(post => post.Tags!.Any(tag => tags.Contains(tag.Id.ToString())));
         }
-
-        var postsList = await posts.ToListAsync();
+        
+       
+        var postsList = await posts.Take(size).ToListAsync();
         var postWithDetails = new List<PostDetailsDTO>();
         foreach (var post in postsList)
         {

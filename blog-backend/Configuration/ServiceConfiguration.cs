@@ -18,5 +18,7 @@ public static class ServiceConfiguration
         services.AddScoped<TagsService>();
         services.AddScoped<GenerateTokenService>();
         services.AddScoped<IGarService, GarService>();
+        services.AddScoped<IAuthorService, AuthorService>();
+        services.AddScoped<IAccountService, AccountService>();
     }
 }

@@ -1,5 +1,6 @@
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
+using blog_backend.DAO.Model.Account;
 using blog_backend.Entity;
 using blog_backend.Entity.AccountEntities;
 using blog_backend.Service;
@@ -21,7 +22,7 @@ public class AccountRepository : IAccountRepository
         _tokenService = tokenService;
     }
 
-    public async Task<TokenDTO> Register(AuthorizationDTO request, string hashPassword)
+    public async Task<TokenDTO> Register(RegistrationDTO request, string hashPassword)
     {
         var user = AuthDtoMapper.Map(request, hashPassword);
         await _dbContext.User.AddAsync(user);

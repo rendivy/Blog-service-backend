@@ -1,13 +1,15 @@
 using System.Text.RegularExpressions;
 using AutoMapper;
 using blog_backend.DAO.Database;
+using blog_backend.DAO.IService;
 using blog_backend.DAO.Model;
+using blog_backend.DAO.Model.Account;
 using blog_backend.Entity.AccountEntities;
 using blog_backend.Service.Extensions;
 
-namespace blog_backend.Service.Account;
+namespace blog_backend.Service;
 
-public class AccountService
+public partial class AccountService : IAccountService
 {
     private readonly GenerateTokenService _tokenService;
     private readonly BlogDbContext _dbContext;
@@ -23,27 +25,23 @@ public class AccountService
 
     private void ValidateUserCredentials(string password, string email, string? phoneNumber)
     {
-        if (password.Length < 6)
+        switch (password.Length)
         {
-            throw new ArgumentException("Password must be at least 6 characters");
+            case < 6:
+                throw new ArgumentException("Password must be at least 6 characters");
+            case > 20:
+                throw new ArgumentException("Password must be less than 20 characters");
         }
 
-        if (password.Length > 20)
-        {
-            throw new ArgumentException("Password must be less than 20 characters");
-        }
-
-        if (!Regex.IsMatch(email, "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"))
+        if (!EmailRegex().IsMatch(email))
         {
             throw new ArgumentException("Invalid email pattern");
         }
 
-        if (phoneNumber != null)
+        if (phoneNumber == null) return;
+        if (!PhoneNumberRegex().IsMatch(phoneNumber))
         {
-            if (!Regex.IsMatch(phoneNumber, "^\\+7\\d{10}$"))
-            {
-                throw new ArgumentException("Invalid phone pattern");
-            }
+            throw new ArgumentException("Invalid phone pattern");
         }
     }
 
@@ -66,8 +64,11 @@ public class AccountService
         {
             var user = await userId.GetUserById(_dbContext);
             var mappedCurrentUser = _mapper.Map(request, user);
-            _dbContext.User.Update(mappedCurrentUser);
-            await _dbContext.SaveChangesAsync();
+            if (mappedCurrentUser != null)
+            {
+                _dbContext.User.Update(mappedCurrentUser);
+                await _dbContext.SaveChangesAsync();
+            }
         }
         else
         {
@@ -81,18 +82,19 @@ public class AccountService
     }
 
 
-    public async Task<TokenDTO> RegisterUser(AuthorizationDTO request)
+    public async Task<TokenDTO> RegisterUser(RegistrationDTO request)
     {
         if (await request.Email.GetUserByEmail(_dbContext) != null)
         {
             throw new ArgumentException("User already exists");
         }
-        ValidateUserCredentials(request.Password, request.Email, request.PhoneNumber);
+
         try
         {
+            ValidateUserCredentials(request.Password, request.Email, request.PhoneNumber);
             var hashPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
             var user = _mapper.Map<User>(request, opt =>
-                opt.AfterMap((src, dest) => dest.Password = hashPassword));
+                opt.AfterMap((_, dest) => dest.Password = hashPassword));
 
             await _dbContext.User.AddAsync(user);
             await _dbContext.SaveChangesAsync();
@@ -104,21 +106,22 @@ public class AccountService
         }
     }
 
-    public async Task<string> LoginUser(LoginDTO request)
+    public async Task<TokenDTO> LoginUser(LoginDTO request)
     {
         var user = await request.Email.GetUserByEmail(_dbContext);
 
-        if (user == null)
-        {
-            throw new ArgumentException("Invalid email or password");
-        }
+        if (user == null) throw new ArgumentException("Invalid email or password");
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
-        {
             throw new ArgumentException("Invalid email or password");
-        }
 
-        var token = await _tokenService.GenerateToken(user);
-        return token;
+
+        return new TokenDTO { Token = await _tokenService.GenerateToken(user) };
     }
+
+    [GeneratedRegex("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$")]
+    private static partial Regex EmailRegex();
+
+    [GeneratedRegex(@"^\+7\d{10}$")]
+    private static partial Regex PhoneNumberRegex();
 }
