@@ -1,8 +1,8 @@
 using blog_backend.Enums;
 
-namespace blog_backend.DAO.Model;
+namespace blog_backend.DAO.Model.Account;
 
-public class AuthorizationDTO
+public class RegistrationDTO
 {
     public  GenderEnum Gender { get; set; }
     public required string Email { get; set; } = null!;

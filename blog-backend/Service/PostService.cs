@@ -1,11 +1,12 @@
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
 using blog_backend.DAO.Model.Enums;
-using blog_backend.Enums;
 using blog_backend.Service.Extensions;
 using blog_backend.Service.Mappers;
 using blog_backend.Service.Repository;
 using Microsoft.EntityFrameworkCore;
+
+namespace blog_backend.Service;
 
 public class PostService
 {
@@ -29,6 +30,10 @@ public class PostService
     {
         var posts = _blogDbContext.Posts.AsQueryable();
         var user = await userId.ToString().GetUserById(_blogDbContext);
+        if (size <= 0) throw new ArgumentException("Invalid size value");
+        if (page <= 0) throw new ArgumentException("Invalid page value");
+        
+        
         if (author != null)
         {
             posts = posts.Where(p => p.Author == author);

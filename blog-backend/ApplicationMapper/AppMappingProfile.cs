@@ -1,5 +1,6 @@
 using AutoMapper;
 using blog_backend.DAO.Model;
+using blog_backend.DAO.Model.Account;
 using blog_backend.Entity.AccountEntities;
 using blog_backend.Entity.PostEntities;
 
@@ -18,7 +19,7 @@ public class AppMappingProfile : Profile
         CreateMap<TagDTO, Tag>();
         CreateMap<CreateTagDTO, Tag>().ForMember(u => u.Id, opt => opt.MapFrom(_ => Guid.NewGuid()));
         CreateMap<User, UserAccountDto>();
-        CreateMap<AuthorizationDTO, User>()
+        CreateMap<RegistrationDTO, User>()
             .ForMember(u => u.Id, opt => opt.MapFrom(_ => Guid.NewGuid()))
             .ForMember(u => u.Password, opt => opt.MapFrom(_ => _hashPassword));
     }

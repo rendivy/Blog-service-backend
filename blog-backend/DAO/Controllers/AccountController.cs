@@ -2,6 +2,7 @@ using System.Security.Claims;
 using AutoMapper;
 using blog_backend.DAO.Database;
 using blog_backend.DAO.Model;
+using blog_backend.DAO.Model.Account;
 using blog_backend.Entity;
 using blog_backend.Entity.AccountEntities;
 using blog_backend.Middleware;
@@ -42,7 +43,7 @@ public class AccountController : GlobalController
 
     [HttpPost("register")]
     [HandleExceptions]
-    public async Task<IActionResult> Register([FromBody] AuthorizationDTO request)
+    public async Task<IActionResult> Register([FromBody] RegistrationDTO request)
     {
         var token = await _accountService.RegisterUser(request);
         return Ok(token);
@@ -63,6 +64,6 @@ public class AccountController : GlobalController
     [HandleExceptions]
     public async Task<IActionResult> Login([FromBody] LoginDTO request)
     {
-        return Ok(new TokenDTO { Token = await _accountService.LoginUser(request) });
+        return Ok(await _accountService.LoginUser(request));
     }
 }
